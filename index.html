@@ -952,16 +952,10 @@ body {
       <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Densidade Corporal:</strong> Siri, W.E. Body composition from fluid spaces and density: analysis of methods. Techniques for measuring body composition, 1956.</p></div>
       <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Diretrizes Gerais:</strong> American College of Sports Medicine (ACSM). ACSM's Guidelines for Exercise Testing and Prescription, 11th Edition, 2021.</p></div>
     </div>`;
-    
-    // Adicionar aviso legal
-    const disclaimerHTML = `<div class="disclaimer-box">
-      <p><strong>⚠️ Aviso Legal:</strong> Esta avaliação não substitui diagnóstico médico ou nutricional. Os resultados representam estimativas da composição corporal baseadas em equações de predição validadas cientificamente. Para orientação profissional individualizada, consulte um nutricionista ou médico especializado.</p>
-    </div>`;
-    
+        
     const interpDiv = document.getElementById('r-interp');
     interpDiv.insertAdjacentHTML('afterend', referencesHTML);
-    interpDiv.nextElementSibling.insertAdjacentHTML('afterend', disclaimerHTML);
-    
+        
     goToScreen('results');
   }
   
@@ -1085,14 +1079,6 @@ body {
     btnPdf.innerHTML = '💾 Salvar como PDF';
     btnPdf.onclick = () => window.print();
     resultsDiv.appendChild(btnPdf);
-    
-    const btnNewEval = document.createElement('button');
-    btnNewEval.className = 'btn btn-secondary';
-    btnNewEval.innerHTML = '🆕 Fazer Minha Avaliação';
-    btnNewEval.onclick = () => {
-      window.location.href = window.location.origin + window.location.pathname;
-    };
-    resultsDiv.appendChild(btnNewEval);
     
     document.getElementById('results').classList.add('active');
   }

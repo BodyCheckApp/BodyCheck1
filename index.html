@@ -3,8 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
 <title>BodyCheck</title>
 <style>
 * {
@@ -335,75 +333,6 @@ body {
   font-size: 0.95rem;
 }
 
-.loading {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.7);
-  z-index: 9999;
-  align-items: center;
-  justify-content: center;
-}
-
-.loading.show {
-  display: flex;
-}
-
-.loading-content {
-  background: #fff;
-  padding: 2rem;
-  border-radius: 16px;
-  text-align: center;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-}
-
-.spinner {
-  border: 4px solid #f3f4f6;
-  border-top: 4px solid #667eea;
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  animation: spin 1s linear infinite;
-  margin: 0 auto 1rem;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.loading-text {
-  color: #374151;
-  font-weight: 600;
-  font-size: 1.1rem;
-}
-
-@media screen and (max-width: 360px) {
-  .header h1 {
-    font-size: 1.6rem;
-  }
-  
-  .btn {
-    font-size: 1rem;
-    padding: 1rem;
-  }
-  
-  .content {
-    padding: 1rem;
-  }
-}
-
-@media screen and (min-width: 768px) {
-  .content {
-    max-width: 600px;
-    margin: 0 auto;
-  }
-}
-
-/* Modal de compartilhamento */
 .share-modal {
   display: none;
   position: fixed;
@@ -455,24 +384,6 @@ body {
   outline: none;
 }
 
-/* Tela de visualização via link */
-.shared-view {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 0;
-}
-
-.shared-view .header {
-  margin-bottom: 0;
-}
-
-.shared-view .content {
-  background: #fff;
-  min-height: calc(100vh - 80px);
-  padding-bottom: 2rem;
-}
-
-/* Gráfico de composição corporal */
 .composition-chart {
   background: #f9fafb;
   padding: 1.5rem;
@@ -542,7 +453,6 @@ body {
   font-weight: 600;
 }
 
-/* Seção de referências */
 .references-section {
   background: linear-gradient(135deg, #f0f4ff 0%, #e6edff 100%);
   padding: 1.5rem;
@@ -564,10 +474,6 @@ body {
   font-size: 0.9rem;
 }
 
-.references-section p:last-child {
-  margin-bottom: 0;
-}
-
 .reference-item {
   display: flex;
   align-items: flex-start;
@@ -581,7 +487,6 @@ body {
   margin-top: 0.2rem;
 }
 
-/* Aviso legal */
 .disclaimer-box {
   background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
   padding: 1.2rem;
@@ -601,18 +506,8 @@ body {
   color: #78350f;
 }
 
-/* Botão de salvar PDF */
-.btn-save-pdf {
-  background: linear-gradient(135deg, #059669 0%, #047857 100%);
-  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
-}
-
-.btn-save-pdf:active {
-  background: linear-gradient(135deg, #047857 0%, #065f46 100%);
-}
-
 @media print {
-  .btn, .btn-secondary, .btn-save-pdf {
+  .btn, .btn-secondary {
     display: none !important;
   }
   
@@ -625,12 +520,8 @@ body {
   .result-card, .composition-chart, .references-section, .disclaimer-box {
     page-break-inside: avoid;
   }
-  
-  .chart-bar.fat, .chart-bar.ffm {
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
 }
+
 </style>
 </head>
 <body>
@@ -641,26 +532,16 @@ body {
   </div>
   
   <div class="content">
-    <!-- TELA 1: HOME -->
     <div id="home" class="screen active">
       <div class="about">
-        <p>O <strong>BodyCheck</strong> é um aplicativo desenvolvido para a avaliação da composição corporal de crianças, adolescentes, adultos e idosos, de ambos os sexos.</p>
-        <p>O app utiliza medidas de dobras cutâneas para estimativas da composição corporal, com base em fórmulas provenientes de estudos científicos validados.</p>
-        <p>A plataforma realiza a aplicação automática das equações e gera relatórios com os resultados, facilitando a interpretação e a padronização das avaliações.</p>
-      </div>
-      
-      <div class="input-group">
-        <label>🌐 Idioma / Language</label>
-        <select id="lang">
-          <option value="pt">Português (Brasil)</option>
-          <option value="en">English</option>
-        </select>
+        <p>O <strong>BodyCheck</strong> é um aplicativo desenvolvido para a avaliação da composição corporal de crianças, adolescentes, adultos e idosos, de ambos os sexos, com foco em praticidade, sendo voltado para profissionais e estudantes da área da saúde, como Educação Física, Nutrição e áreas afins, auxiliando na prática profissional.</p>
+        <p>O aplicativo utiliza medidas de dobras cutâneas para a estimativa de diferentes componentes da composição corporal, como gordura corporal e massa magra, empregando equações preditivas amplamente utilizadas na literatura científica, provenientes de estudos validados em diferentes populações.</p>
+        <p>A plataforma realiza a aplicação automática das fórmulas, reduzindo erros de cálculo e otimizando o tempo do avaliador. Após a inserção das medidas, o BodyCheck gera relatórios organizados e de fácil interpretação, contribuindo para uma avaliação mais precisa.</p>
       </div>
       
       <button class="btn" id="btn-start">▶️ Iniciar Avaliação</button>
     </div>
 
-    <!-- TELA 2: INFORMAÇÕES -->
     <div id="info" class="screen">
       <h2 class="section-title">Informações Pessoais</h2>
       
@@ -702,7 +583,6 @@ body {
       <button class="btn back-btn" id="btn-back-info">Voltar</button>
     </div>
 
-    <!-- TELA 3: DOBRAS -->
     <div id="folds" class="screen">
       <h2 class="section-title">Medidas de Dobras Cutâneas</h2>
       <p class="info-text">Digite as medidas em milímetros (mm)</p>
@@ -713,11 +593,9 @@ body {
       <button class="btn back-btn" id="btn-back-folds">Voltar</button>
     </div>
 
-    <!-- TELA 4: RESULTADOS -->
     <div id="results" class="screen">
       <h2 class="section-title">Resultados da Avaliação</h2>
       
-      <!-- Informações do Paciente -->
       <div class="result-card">
         <h3>Informações do Paciente</h3>
         <div class="result-item">
@@ -742,7 +620,6 @@ body {
         </div>
       </div>
       
-      <!-- Dobras Cutâneas -->
       <div class="result-card">
         <h3>Dobras Cutâneas Medidas</h3>
         <div id="r-folds-container"></div>
@@ -789,7 +666,6 @@ body {
       <button class="btn" id="btn-share-link">🔗 Gerar Link Compartilhável</button>
       <button class="btn btn-secondary" id="btn-new">🔄 Nova Avaliação</button>
       
-      <!-- Modal para mostrar o link -->
       <div id="share-modal" class="share-modal">
         <div class="share-modal-content">
           <h3 style="color: #667eea; margin-bottom: 1rem;">🔗 Link Compartilhável</h3>
@@ -807,513 +683,24 @@ body {
   </div>
 </div>
 
-<div id="loading" class="loading">
-  <div class="loading-content">
-    <div class="spinner"></div>
-    <div class="loading-text">Processando...</div>
-  </div>
-</div>
-
 <script>
 (function() {
   'use strict';
   
-  let appData = {
-    name: '',
-    sex: '',
-    age: 0,
-    height: 0,
-    weight: 0,
-    eq: '',
-    foldIds: []
-  };
-  
+  let appData = {name: '', sex: '', age: 0, height: 0, weight: 0, eq: '', foldIds: []};
   let results = {};
   let currentFolds = {};
-  let currentLang = 'pt';
   
-  // Traduções
-  const translations = {
-    pt: {
-      appTitle: 'BodyCheck',
-      appSubtitle: 'Avaliação da Composição Corporal',
-      aboutText1: 'O <strong>BodyCheck</strong> é um aplicativo desenvolvido para a avaliação da composição corporal de crianças, adolescentes, adultos e idosos, de ambos os sexos.',
-      aboutText2: 'O app utiliza medidas de dobras cutâneas para estimativas da composição corporal, com base em fórmulas provenientes de estudos científicos validados.',
-      aboutText3: 'A plataforma realiza a aplicação automática das equações e gera relatórios com os resultados, facilitando a interpretação e a padronização das avaliações.',
-      language: 'Idioma / Language',
-      startBtn: '▶️ Iniciar Avaliação',
-      personalInfo: 'Informações Pessoais',
-      fullName: 'Nome Completo',
-      fullNamePlaceholder: 'Digite o nome completo',
-      sex: 'Sexo',
-      male: 'Masculino',
-      female: 'Feminino',
-      age: 'Idade (anos)',
-      agePlaceholder: 'Digite a idade',
-      height: 'Altura (cm)',
-      heightPlaceholder: 'Digite a altura',
-      weight: 'Peso Corporal (kg)',
-      weightPlaceholder: 'Digite o peso',
-      continueBtn: 'Continuar',
-      backBtn: 'Voltar',
-      skinfoldMeasures: 'Medidas de Dobras Cutâneas',
-      enterMeasures: 'Digite as medidas em milímetros (mm)',
-      measurePlaceholder: 'Digite a medida',
-      calculateBtn: 'Calcular',
-      results: 'Resultados da Avaliação',
-      patientInfo: 'Informações do Paciente',
-      name: 'Nome',
-      skinfoldsMeasured: 'Dobras Cutâneas Medidas',
-      equationUsed: 'Equação utilizada',
-      bmi: 'Índice de Massa Corporal (IMC)',
-      classification: 'Classificação',
-      bodyComposition: 'Composição Corporal',
-      bodyFatPercentage: 'Percentual de Gordura',
-      fatMass: 'Massa Gorda',
-      fatFreeMass: 'Massa Livre de Gordura',
-      interpretation: 'Interpretação',
-      compositionChart: '📊 Gráfico de Composição Corporal',
-      references: '📚 Referências Científicas',
-      disclaimer: '⚠️ Aviso Legal: Esta avaliação não substitui diagnóstico médico ou nutricional. Os resultados representam estimativas da composição corporal baseadas em equações de predição validadas cientificamente. Para orientação profissional individualizada, consulte um nutricionista ou médico especializado.',
-      generateLink: '🔗 Gerar Link Compartilhável',
-      newEvaluation: '🔄 Nova Avaliação',
-      savePdf: '💾 Salvar como PDF',
-      shareTitle: '🔗 Link Compartilhável',
-      shareDescription: 'Copie o link abaixo e compartilhe com quem quiser. Qualquer pessoa poderá visualizar os resultados desta avaliação.',
-      copyLink: '📋 Copiar Link',
-      close: 'Fechar',
-      linkCopied: '✅ Link copiado! Agora você pode colar e compartilhar em qualquer aplicativo.',
-      linkCopyError: '❌ Não foi possível copiar automaticamente. Por favor, selecione e copie o link manualmente.',
-      // Alertas
-      enterName: 'Digite o nome completo',
-      selectSex: 'Selecione o sexo',
-      invalidAge: 'Idade inválida (5-120 anos)',
-      invalidHeight: 'Altura inválida (50-250 cm)',
-      invalidWeight: 'Peso inválido (10-300 kg)',
-      enterAllMeasures: 'Digite todas as medidas (1-100 mm)',
-      // Dobras
-      triceps: 'Tríceps (Tricipital)',
-      biceps: 'Bíceps (Bicipital)',
-      subscapular: 'Subescapular',
-      suprailiac: 'Suprailíaca',
-      chest: 'Peitoral',
-      abdominal: 'Abdominal',
-      thigh: 'Coxa'
-    },
-    en: {
-      appTitle: 'BodyCheck',
-      appSubtitle: 'Body Composition Assessment',
-      aboutText1: '<strong>BodyCheck</strong> is an application developed for body composition assessment of children, adolescents, adults and elderly, of both sexes.',
-      aboutText2: 'The app uses skinfold measurements to estimate body composition, based on formulas from validated scientific studies.',
-      aboutText3: 'The platform automatically applies the equations and generates reports with results, facilitating interpretation and standardization of assessments.',
-      language: 'Language / Idioma',
-      startBtn: '▶️ Start Assessment',
-      personalInfo: 'Personal Information',
-      fullName: 'Full Name',
-      fullNamePlaceholder: 'Enter full name',
-      sex: 'Sex',
-      male: 'Male',
-      female: 'Female',
-      age: 'Age (years)',
-      agePlaceholder: 'Enter age',
-      height: 'Height (cm)',
-      heightPlaceholder: 'Enter height',
-      weight: 'Body Weight (kg)',
-      weightPlaceholder: 'Enter weight',
-      continueBtn: 'Continue',
-      backBtn: 'Back',
-      skinfoldMeasures: 'Skinfold Measurements',
-      enterMeasures: 'Enter measurements in millimeters (mm)',
-      measurePlaceholder: 'Enter measurement',
-      calculateBtn: 'Calculate',
-      results: 'Assessment Results',
-      patientInfo: 'Patient Information',
-      name: 'Name',
-      skinfoldsMeasured: 'Skinfolds Measured',
-      equationUsed: 'Equation used',
-      bmi: 'Body Mass Index (BMI)',
-      classification: 'Classification',
-      bodyComposition: 'Body Composition',
-      bodyFatPercentage: 'Body Fat Percentage',
-      fatMass: 'Fat Mass',
-      fatFreeMass: 'Fat Free Mass',
-      interpretation: 'Interpretation',
-      compositionChart: '📊 Body Composition Chart',
-      references: '📚 Scientific References',
-      disclaimer: '⚠️ Legal Notice: This assessment does not replace medical or nutritional diagnosis. Results represent body composition estimates based on scientifically validated prediction equations. For individualized professional guidance, consult a nutritionist or specialized physician.',
-      generateLink: '🔗 Generate Shareable Link',
-      newEvaluation: '🔄 New Assessment',
-      savePdf: '💾 Save as PDF',
-      shareTitle: '🔗 Shareable Link',
-      shareDescription: 'Copy the link below and share with anyone. Anyone will be able to view the results of this assessment.',
-      copyLink: '📋 Copy Link',
-      close: 'Close',
-      linkCopied: '✅ Link copied! You can now paste and share in any application.',
-      linkCopyError: '❌ Could not copy automatically. Please select and copy the link manually.',
-      // Alerts
-      enterName: 'Enter full name',
-      selectSex: 'Select sex',
-      invalidAge: 'Invalid age (5-120 years)',
-      invalidHeight: 'Invalid height (50-250 cm)',
-      invalidWeight: 'Invalid weight (10-300 kg)',
-      enterAllMeasures: 'Enter all measurements (1-100 mm)',
-      // Skinfolds
-      triceps: 'Triceps',
-      biceps: 'Biceps',
-      subscapular: 'Subscapular',
-      suprailiac: 'Suprailiac',
-      chest: 'Chest',
-      abdominal: 'Abdominal',
-      thigh: 'Thigh'
-    }
-  };
-  
-  // Função para obter texto traduzido
-  function t(key) {
-    return translations[currentLang][key] || key;
+  function goToScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    window.scrollTo(0, 0);
   }
   
-  // Função para atualizar textos da interface
-  function updateLanguage() {
-    // Home
-    document.querySelector('.header h1').textContent = t('appTitle');
-    document.querySelector('.header p').textContent = t('appSubtitle');
-    
-    const aboutPs = document.querySelectorAll('.about p');
-    if (aboutPs.length >= 3) {
-      aboutPs[0].innerHTML = t('aboutText1');
-      aboutPs[1].innerHTML = t('aboutText2');
-      aboutPs[2].innerHTML = t('aboutText3');
-    }
-    
-    document.querySelector('label[for="lang"]').innerHTML = '🌐 ' + t('language');
-    document.getElementById('btn-start').innerHTML = t('startBtn');
-    
-    // Info screen
-    const infoTitle = document.querySelector('#info .section-title');
-    if (infoTitle) infoTitle.textContent = t('personalInfo');
-    
-    const labels = document.querySelectorAll('#info .input-group label');
-    if (labels[0]) labels[0].textContent = t('fullName');
-    if (labels[1]) labels[1].textContent = t('sex');
-    if (labels[2]) labels[2].textContent = t('age');
-    if (labels[3]) labels[3].textContent = t('height');
-    if (labels[4]) labels[4].textContent = t('weight');
-    
-    document.getElementById('name').placeholder = t('fullNamePlaceholder');
-    document.getElementById('age').placeholder = t('agePlaceholder');
-    document.getElementById('height').placeholder = t('heightPlaceholder');
-    document.getElementById('weight').placeholder = t('weightPlaceholder');
-    
-    const sexOptions = document.querySelectorAll('.radio-option');
-    if (sexOptions[0]) sexOptions[0].querySelector('div:last-child').textContent = t('male');
-    if (sexOptions[1]) sexOptions[1].querySelector('div:last-child').textContent = t('female');
-    
-    document.getElementById('btn-continue').textContent = t('continueBtn');
-    document.getElementById('btn-back-info').textContent = t('backBtn');
-    
-    // Folds screen
-    const foldsTitle = document.querySelector('#folds .section-title');
-    if (foldsTitle) foldsTitle.textContent = t('skinfoldMeasures');
-    
-    const infoText = document.querySelector('#folds .info-text');
-    if (infoText) infoText.textContent = t('enterMeasures');
-    
-    document.getElementById('btn-calculate').textContent = t('calculateBtn');
-    document.getElementById('btn-back-folds').textContent = t('backBtn');
-    
-    // Results screen
-    const resultsTitle = document.querySelector('#results .section-title');
-    if (resultsTitle) resultsTitle.textContent = t('results');
-    
-    document.getElementById('btn-share-link').innerHTML = t('generateLink');
-    document.getElementById('btn-new').innerHTML = t('newEvaluation');
-  }
-  
-  // Função para codificar dados em Base64 para URL
-  function encodeData(data) {
-    const jsonString = JSON.stringify(data);
-    return btoa(encodeURIComponent(jsonString));
-  }
-  
-  // Função para decodificar dados da URL
-  function decodeData(encoded) {
-    try {
-      const jsonString = decodeURIComponent(atob(encoded));
-      return JSON.parse(jsonString);
-    } catch (e) {
-      return null;
-    }
-  }
-  
-  // Verificar se é uma visualização compartilhada
-  function checkSharedView() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const sharedData = urlParams.get('data');
-    
-    if (sharedData) {
-      const data = decodeData(sharedData);
-      if (data) {
-        displaySharedResults(data);
-        return true;
-      }
-    }
-    return false;
-  }
-  
-  // Exibir resultados compartilhados
-  function displaySharedResults(data) {
-    // Definir idioma do link compartilhado
-    if (data.lang) {
-      currentLang = data.lang;
-    }
-    
-    // Ocultar todas as telas e mostrar apenas results
-    document.getElementById('home').style.display = 'none';
-    document.getElementById('info').style.display = 'none';
-    document.getElementById('folds').style.display = 'none';
-    
-    // Adicionar classe especial para visualização compartilhada
-    document.querySelector('.app').classList.add('shared-view');
-    
-    // Atualizar textos do cabeçalho com idioma correto
-    document.querySelector('.header h1').textContent = t('appTitle');
-    document.querySelector('.header p').textContent = t('appSubtitle');
-    
-    // Preencher todos os dados
-    document.getElementById('r-name').textContent = data.name;
-    document.getElementById('r-sex').textContent = data.sex === 'm' ? t('male') : t('female');
-    document.getElementById('r-age').textContent = data.age + ' ' + (currentLang === 'pt' ? 'anos' : 'years');
-    document.getElementById('r-height').textContent = data.height + ' cm';
-    document.getElementById('r-weight').textContent = data.weight + ' kg';
-    document.getElementById('r-equation').textContent = data.equation;
-    
-    // Preencher dobras
-    const foldNames = {
-      triceps: t('triceps'),
-      biceps: t('biceps'),
-      subscapular: t('subscapular'),
-      suprailiac: t('suprailiac'),
-      chest: t('chest'),
-      abdominal: t('abdominal'),
-      thigh: t('thigh')
-    };
-    
-    const foldsContainer = document.getElementById('r-folds-container');
-    foldsContainer.innerHTML = '';
-    
-    for (let key in data.folds) {
-      const div = document.createElement('div');
-      div.className = 'result-item';
-      div.innerHTML = '<span class="result-label">' + foldNames[key] + '</span>' +
-                     '<span class="result-value">' + data.folds[key] + ' mm</span>';
-      foldsContainer.appendChild(div);
-    }
-    
-    // Preencher resultados
-    document.getElementById('r-bmi').textContent = data.bmi;
-    document.getElementById('r-bf').textContent = data.bf + '%';
-    document.getElementById('r-fm').textContent = data.fm + ' kg';
-    document.getElementById('r-ffm').textContent = data.ffm + ' kg';
-    
-    document.getElementById('r-bmi-class').innerHTML = '<span class="classification ' + data.bmiCol + '">' + data.bmiC + '</span>';
-    document.getElementById('r-bf-class').innerHTML = '<span class="classification ' + data.bfCol + '">' + data.bfC + '</span>';
-    
-    // Adicionar gráfico de composição corporal ANTES da interpretação
-    const bfPercent = parseFloat(data.bf);
-    const ffmPercent = (100 - bfPercent).toFixed(1);
-    
-    const fatMassLabel = currentLang === 'pt' ? 'Massa Gorda' : 'Fat Mass';
-    const ffmLabel = currentLang === 'pt' ? 'Massa Livre de Gordura' : 'Fat Free Mass';
-    
-    const chartHTML = '<div class="composition-chart">' +
-      '<h3 style="color: #667eea; margin-bottom: 1rem; font-size: 1.15rem;">' + t('compositionChart') + '</h3>' +
-      '<div class="chart-single-bar">' +
-      '<div class="chart-segment fat" style="width: ' + bfPercent + '%">' + data.bf + '%</div>' +
-      '<div class="chart-segment ffm" style="width: ' + ffmPercent + '%">' + ffmPercent + '%</div>' +
-      '</div>' +
-      '<div class="chart-legend">' +
-      '<div class="legend-item">' +
-      '<div class="legend-color fat"></div>' +
-      '<span class="legend-text">' + fatMassLabel + ': ' + data.bf + '% (' + data.fm + ' kg)</span>' +
-      '</div>' +
-      '<div class="legend-item">' +
-      '<div class="legend-color ffm"></div>' +
-      '<span class="legend-text">' + ffmLabel + ': ' + ffmPercent + '% (' + data.ffm + ' kg)</span>' +
-      '</div>' +
-      '</div>' +
-      '</div>';
-    
-    // Inserir gráfico ANTES da interpretação
-    const bodyCompositionCard = document.getElementById('r-bf').closest('.result-card');
-    bodyCompositionCard.insertAdjacentHTML('afterend', chartHTML);
-    
-    // Adicionar interpretação
-    const interpretationLabel = currentLang === 'pt' ? 'Interpretação' : 'Interpretation';
-    document.getElementById('r-interp').innerHTML = '<strong>' + interpretationLabel + ':</strong><br>' + data.interp;
-    // Adicionar interpretação
-    document.getElementById('r-interp').innerHTML = '<strong>Interpretação:</strong><br>' + data.interp;
-    
-    // Adicionar referências científicas após interpretação
-    // Adicionar referências científicas após interpretação
-    const equationUsed = currentLang === 'pt' ? 'Equação utilizada' : 'Equation used';
-    const bmiClassAdults = currentLang === 'pt' ? 'Classificação do IMC (Adultos)' : 'BMI Classification (Adults)';
-    const bmiClassElderly = currentLang === 'pt' ? 'Classificação do IMC (Idosos)' : 'BMI Classification (Elderly)';
-    const bodyFatPerc = currentLang === 'pt' ? 'Percentual de Gordura Corporal' : 'Body Fat Percentage';
-    const bodyDensity = currentLang === 'pt' ? 'Densidade Corporal' : 'Body Density';
-    const generalGuidelines = currentLang === 'pt' ? 'Diretrizes Gerais' : 'General Guidelines';
-    
-    const referencesHTML = '<div class="references-section">' +
-      '<h3>' + t('references') + '</h3>' +
-      '<div class="reference-item"><span class="reference-bullet">•</span><p><strong>' + equationUsed + ':</strong> ' + data.equation + '</p></div>' +
-      '<div class="reference-item"><span class="reference-bullet">•</span><p><strong>' + bmiClassAdults + ':</strong> World Health Organization (WHO). Obesity: Preventing and Managing the Global Epidemic. WHO Technical Report Series 894, Geneva, 2000.</p></div>' +
-      '<div class="reference-item"><span class="reference-bullet">•</span><p><strong>' + bmiClassElderly + ':</strong> Lipschitz, D.A. Screening for nutritional status in the elderly. Primary Care, 21(1):55-67, 1994.</p></div>' +
-      '<div class="reference-item"><span class="reference-bullet">•</span><p><strong>' + bodyFatPerc + ':</strong> Gallagher, D. et al. Healthy percentage body fat ranges: an approach for developing guidelines based on body mass index. American Journal of Clinical Nutrition, 72(3):694-701, 2000.</p></div>' +
-      '<div class="reference-item"><span class="reference-bullet">•</span><p><strong>' + bodyDensity + ':</strong> Siri, W.E. Body composition from fluid spaces and density: analysis of methods. Techniques for measuring body composition, 1956.</p></div>' +
-      '<div class="reference-item"><span class="reference-bullet">•</span><p><strong>' + generalGuidelines + ':</strong> American College of Sports Medicine (ACSM). ACSM\'s Guidelines for Exercise Testing and Prescription, 11th Edition, 2021.</p></div>' +
-      '</div>';
-    
-    // Adicionar aviso legal
-    const disclaimerHTML = '<div class="disclaimer-box">' +
-      '<p>' + t('disclaimer') + '</p>' +
-      '</div>';
-    
-    // Inserir referências e aviso após interpretação
-    const interpDiv = document.getElementById('r-interp');
-    interpDiv.insertAdjacentHTML('afterend', referencesHTML);
-    
-    const referencesDiv = interpDiv.nextElementSibling;
-    referencesDiv.insertAdjacentHTML('afterend', disclaimerHTML);
-    
-    // Ocultar botão de compartilhar e o botão "Fazer Minha Avaliação"
-    document.getElementById('btn-share-link').style.display = 'none';
-    document.getElementById('btn-new').style.display = 'none';
-    
-    // Adicionar apenas botão "Salvar PDF"
-    const resultsDiv = document.getElementById('results');
-    const btnSavePdf = document.createElement('button');
-    btnSavePdf.className = 'btn btn-save-pdf';
-    btnSavePdf.id = 'btn-save-shared-pdf';
-    btnSavePdf.innerHTML = t('savePdf');
-    resultsDiv.appendChild(btnSavePdf);
-    
-    // Event listener para salvar PDF
-    btnSavePdf.addEventListener('click', function() {
-      window.print();
-    });
-    
-    // Atualizar títulos dos cards
-    const resultCards = document.querySelectorAll('#results .result-card h3');
-    if (resultCards[0]) resultCards[0].textContent = t('patientInfo');
-    if (resultCards[1]) resultCards[1].textContent = t('skinfoldsMeasured');
-    if (resultCards[2]) resultCards[2].textContent = t('bmi');
-    if (resultCards[3]) resultCards[3].textContent = t('bodyComposition');
-    
-    // Atualizar labels dos resultados
-    const labels = document.querySelectorAll('#results .result-label');
-    const labelTexts = [t('name'), t('sex'), t('age'), t('height'), t('weight'), t('equationUsed'), t('bmi'), t('classification'), t('bodyFatPercentage'), t('classification'), t('fatMass'), t('fatFreeMass')];
-    labels.forEach(function(label, index) {
-      if (labelTexts[index]) {
-        label.textContent = labelTexts[index];
-      }
-    });
-    
-    // Mostrar tela de resultados
-    document.getElementById('results').classList.add('active');
-  }
-  
-  // Gerar link compartilhável
-  function generateShareLink() {
-    const shareData = {
-      name: appData.name,
-      sex: appData.sex,
-      age: appData.age,
-      height: appData.height,
-      weight: appData.weight,
-      equation: appData.eq,
-      folds: results.folds,
-      bmi: results.bmi,
-      bf: results.bf,
-      fm: results.fm,
-      ffm: results.ffm,
-      bmiC: results.bmiC,
-      bfC: results.bfC,
-      bmiCol: getBmiColor(results.bmiC),
-      bfCol: getBfColor(results.bfC),
-      interp: results.interp,
-      lang: currentLang // Adicionar idioma aos dados
-    };
-    
-    const encoded = encodeData(shareData);
-    const baseUrl = window.location.origin + window.location.pathname;
-    const shareLink = baseUrl + '?data=' + encoded;
-    
-    // Mostrar modal com o link
-    document.getElementById('share-link-input').value = shareLink;
-    
-    // Traduzir modal
-    document.querySelector('#share-modal h3').innerHTML = t('shareTitle');
-    document.querySelector('#share-modal p').textContent = t('shareDescription');
-    document.getElementById('btn-copy-link').innerHTML = t('copyLink');
-    document.getElementById('btn-close-modal').textContent = t('close');
-    
-    document.getElementById('share-modal').classList.add('show');
-  }
-  
-  // Obter classe de cor do IMC
-  function getBmiColor(classification) {
-    if (classification === 'Peso normal' || classification === 'Peso adequado') return 'normal';
-    if (classification.includes('Obesidade')) return 'warning';
-    if (classification === 'Baixo peso') return 'warning';
-    return 'attention';
-  }
-  
-  // Obter classe de cor do BF
-  function getBfColor(classification) {
-    if (classification === 'Adequado') return 'normal';
-    if (classification === 'Alto') return 'warning';
-    return 'attention';
-  }
-  
-  // Copiar link para área de transferência
-  function copyShareLink() {
-    const input = document.getElementById('share-link-input');
-    input.select();
-    input.setSelectionRange(0, 99999); // Para mobile
-    
-    try {
-      document.execCommand('copy');
-      alert(t('linkCopied'));
-    } catch (err) {
-      // Fallback para navegadores mais novos
-      navigator.clipboard.writeText(input.value).then(function() {
-        alert(t('linkCopied'));
-      }).catch(function() {
-        alert(t('linkCopyError'));
-      });
-    }
-  }
-  
-  function goToScreen(screenId) {
-    const screens = document.querySelectorAll('.screen');
-    screens.forEach(function(screen) {
-      screen.classList.remove('active');
-    });
-    
-    const targetScreen = document.getElementById(screenId);
-    if (targetScreen) {
-      targetScreen.classList.add('active');
-      window.scrollTo(0, 0);
-    }
-  }
-  
-  function selectSex(element, value) {
-    const options = document.querySelectorAll('.radio-option');
-    options.forEach(function(opt) {
-      opt.classList.remove('selected');
-    });
-    element.classList.add('selected');
-    appData.sex = value;
+  function selectSex(el, val) {
+    document.querySelectorAll('.radio-option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    appData.sex = val;
   }
   
   function validateInfo() {
@@ -1322,42 +709,21 @@ body {
     const height = parseFloat(document.getElementById('height').value);
     const weight = parseFloat(document.getElementById('weight').value);
     
-    if (!name) {
-      alert(t('enterName'));
-      return false;
-    }
-    
-    if (!appData.sex) {
-      alert(t('selectSex'));
-      return false;
-    }
-    
-    if (!age || age < 5 || age > 120) {
-      alert(t('invalidAge'));
-      return false;
-    }
-    
-    if (!height || height < 50 || height > 250) {
-      alert(t('invalidHeight'));
-      return false;
-    }
-    
-    if (!weight || weight < 10 || weight > 300) {
-      alert(t('invalidWeight'));
-      return false;
-    }
+    if (!name) { alert('Digite o nome completo'); return false; }
+    if (!appData.sex) { alert('Selecione o sexo'); return false; }
+    if (!age || age < 5 || age > 120) { alert('Idade inválida (5-120 anos)'); return false; }
+    if (!height || height < 50 || height > 250) { alert('Altura inválida (50-250 cm)'); return false; }
+    if (!weight || weight < 10 || weight > 300) { alert('Peso inválido (10-300 kg)'); return false; }
     
     appData.name = name;
     appData.age = age;
     appData.height = height;
     appData.weight = weight;
-    
     return true;
   }
   
   function setupFolds() {
-    const sex = appData.sex;
-    const age = appData.age;
+    const {sex, age} = appData;
     let folds = [];
     
     if (age <= 17) {
@@ -1376,106 +742,59 @@ body {
       appData.eq = 'Durnin & Womersley (1974)';
     }
     
-    const foldNames = {
-      triceps: {
-        name: 'Tríceps (Tricipital)',
-        desc: 'Medida na parte posterior do braço, exatamente no ponto médio entre o ombro (acrômio) e o cotovelo (olécrano). A dobra é coletada na vertical, com o braço relaxado e estendido ao lado do corpo.'
-      },
-      biceps: {
-        name: 'Bíceps (Bicipital)',
-        desc: 'Medida na parte anterior do braço, no mesmo nível da dobra tricipital. A dobra é coletada na vertical, com o braço relaxado e a palma da mão voltada para frente.'
-      },
-      subscapular: {
-        name: 'Subescapular',
-        desc: 'Medida 1 a 2 cm abaixo do ângulo inferior da escápula (omoplata). A dobra é coletada na diagonal, acompanhando a inclinação natural da pele.'
-      },
-      suprailiac: {
-        name: 'Suprailíaca',
-        desc: 'Medida logo acima da crista ilíaca, na linha média axilar (linha lateral do tronco). A dobra é coletada na diagonal, seguindo a orientação natural do osso do quadril.'
-      },
-      chest: {
-        name: 'Peitoral',
-        desc: 'Medida na região peitoral, entre o mamilo e a axila. A dobra é coletada na diagonal.'
-      },
-      abdominal: {
-        name: 'Abdominal',
-        desc: 'Medida aproximadamente 2 cm à direita do umbigo. A dobra é coletada na vertical, com o indivíduo em posição relaxada.'
-      },
-      thigh: {
-        name: 'Coxa',
-        desc: 'Medida na parte anterior da coxa, no ponto médio entre a virilha e a borda superior da patela (joelho). A dobra é coletada na vertical, com o peso corporal distribuído igualmente entre as pernas.'
-      }
+    const names = {
+      triceps: {n: 'Tríceps (Tricipital)', d: 'Medida na parte posterior do braço, no ponto médio entre ombro e cotovelo.'},
+      biceps: {n: 'Bíceps (Bicipital)', d: 'Medida na parte anterior do braço, no mesmo nível da dobra tricipital.'},
+      subscapular: {n: 'Subescapular', d: 'Medida 1-2 cm abaixo do ângulo inferior da escápula, na diagonal.'},
+      suprailiac: {n: 'Suprailíaca', d: 'Medida acima da crista ilíaca, na linha média axilar, na diagonal.'},
+      chest: {n: 'Peitoral', d: 'Medida na metade da distância entre a linha axilar anterior e o mamilo, na diagonal.'},
+      abdominal: {n: 'Abdominal', d: 'Medida 2 cm à direita do umbigo, na vertical.'},
+      thigh: {n: 'Coxa', d: 'Medida na parte anterior da coxa, entre virilha e joelho.'}
     };
     
-    const container = document.getElementById('fold-inputs');
-    container.innerHTML = '';
+    const c = document.getElementById('fold-inputs');
+    c.innerHTML = '';
     
-    for (let i = 0; i < folds.length; i++) {
-      const fold = folds[i];
+    folds.forEach(f => {
       const div = document.createElement('div');
       div.className = 'input-group';
-      div.innerHTML = '<label>' + foldNames[fold].name + ' (mm) <span class="help-icon" data-help="h-' + fold + '">?</span></label>' +
-        '<input type="number" id="f-' + fold + '" placeholder="Digite a medida" step="0.1" min="1" max="100">' +
-        '<div id="h-' + fold + '" class="help-popup"><strong>Como medir:</strong><br>' + foldNames[fold].desc + '</div>';
-      container.appendChild(div);
-    }
+      div.innerHTML = `<label>${names[f].n} (mm) <span class="help-icon" data-help="h-${f}">?</span></label>
+        <input type="number" id="f-${f}" placeholder="Digite a medida" step="0.1" min="1" max="100">
+        <div id="h-${f}" class="help-popup"><strong>Como medir:</strong><br>${names[f].d}</div>`;
+      c.appendChild(div);
+    });
     
     appData.foldIds = folds;
     
-    setTimeout(function() {
-      const helpIcons = container.querySelectorAll('.help-icon');
-      helpIcons.forEach(function(icon) {
+    setTimeout(() => {
+      c.querySelectorAll('.help-icon').forEach(icon => {
         icon.addEventListener('click', function() {
-          const helpId = this.getAttribute('data-help');
-          toggleHelp(helpId);
+          const id = this.getAttribute('data-help');
+          const popup = document.getElementById(id);
+          document.querySelectorAll('.help-popup').forEach(p => {
+            if (p.id !== id) p.classList.remove('show');
+          });
+          popup.classList.toggle('show');
         });
       });
     }, 100);
   }
   
-  function toggleHelp(helpId) {
-    const allPopups = document.querySelectorAll('.help-popup');
-    const targetPopup = document.getElementById(helpId);
-    
-    allPopups.forEach(function(popup) {
-      if (popup.id !== helpId) {
-        popup.classList.remove('show');
-      }
-    });
-    
-    if (targetPopup) {
-      targetPopup.classList.toggle('show');
-    }
-  }
-  
   function calculate() {
     currentFolds = {};
-    let allValid = true;
+    let valid = true;
     
-    for (let i = 0; i < appData.foldIds.length; i++) {
-      const foldId = appData.foldIds[i];
-      const input = document.getElementById('f-' + foldId);
-      const value = parseFloat(input.value);
-      
-      if (!value || value < 1 || value > 100) {
-        allValid = false;
-      } else {
-        currentFolds[foldId] = value;
-      }
-    }
+    appData.foldIds.forEach(id => {
+      const val = parseFloat(document.getElementById('f-' + id).value);
+      if (!val || val < 1 || val > 100) valid = false;
+      else currentFolds[id] = val;
+    });
     
-    if (!allValid) {
-      alert(t('enterAllMeasures'));
-      return;
-    }
+    if (!valid) { alert('Digite todas as medidas (1-100 mm)'); return; }
     
-    const sex = appData.sex;
-    const age = appData.age;
-    const height = appData.height;
-    const weight = appData.weight;
+    const {sex, age, height, weight} = appData;
     const h = height / 100;
     const bmi = (weight / (h * h)).toFixed(1);
-    
     let bd, bf;
     
     if (age <= 17) {
@@ -1499,373 +818,388 @@ body {
     const fm = (bf / 100) * weight;
     const ffm = weight - fm;
     
-    results = {
-      bmi: bmi,
-      bf: bf.toFixed(1),
-      fm: fm.toFixed(1),
-      ffm: ffm.toFixed(1),
-      bmiC: '',
-      bfC: '',
-      folds: {}
-    };
-    
-    for (let key in currentFolds) {
-      results.folds[key] = currentFolds[key];
-    }
+    results = {bmi, bf: bf.toFixed(1), fm: fm.toFixed(1), ffm: ffm.toFixed(1), folds: {...currentFolds}};
     
     let bmiC, bmiCol;
     if (age >= 60) {
-      // Classificação para idosos (Lipschitz, 1994)
-      if (bmi < 22) {
-        bmiC = 'Baixo peso';
-        bmiCol = 'warning';
-      } else if (bmi < 27) {
-        bmiC = 'Peso adequado';
-        bmiCol = 'normal';
-      } else if (bmi < 30) {
-        bmiC = 'Sobrepeso';
-        bmiCol = 'attention';
-      } else if (bmi < 35) {
-        bmiC = 'Obesidade Grau I';
-        bmiCol = 'warning';
-      } else if (bmi < 40) {
-        bmiC = 'Obesidade Grau II';
-        bmiCol = 'warning';
-      } else {
-        bmiC = 'Obesidade Grau III';
-        bmiCol = 'warning';
-      }
+      if (bmi < 22) { bmiC = 'Baixo peso'; bmiCol = 'warning'; }
+      else if (bmi < 27) { bmiC = 'Peso adequado'; bmiCol = 'normal'; }
+      else if (bmi < 30) { bmiC = 'Sobrepeso'; bmiCol = 'attention'; }
+      else if (bmi < 35) { bmiC = 'Obesidade Grau I'; bmiCol = 'warning'; }
+      else if (bmi < 40) { bmiC = 'Obesidade Grau II'; bmiCol = 'warning'; }
+      else { bmiC = 'Obesidade Grau III'; bmiCol = 'warning'; }
     } else {
-      // Classificação OMS para adultos
-      if (bmi < 18.5) {
-        bmiC = 'Baixo peso';
-        bmiCol = 'warning';
-      } else if (bmi <= 24.9) {
-        bmiC = 'Peso normal';
-        bmiCol = 'normal';
-      } else if (bmi <= 29.9) {
-        bmiC = 'Sobrepeso';
-        bmiCol = 'attention';
-      } else if (bmi <= 34.9) {
-        bmiC = 'Obesidade Grau I';
-        bmiCol = 'warning';
-      } else if (bmi <= 39.9) {
-        bmiC = 'Obesidade Grau II';
-        bmiCol = 'warning';
-      } else {
-        bmiC = 'Obesidade Grau III';
-        bmiCol = 'warning';
-      }
+      if (bmi < 18.5) { bmiC = 'Baixo peso'; bmiCol = 'warning'; }
+      else if (bmi <= 24.9) { bmiC = 'Peso normal'; bmiCol = 'normal'; }
+      else if (bmi <= 29.9) { bmiC = 'Sobrepeso'; bmiCol = 'attention'; }
+      else if (bmi <= 34.9) { bmiC = 'Obesidade Grau I'; bmiCol = 'warning'; }
+      else if (bmi <= 39.9) { bmiC = 'Obesidade Grau II'; bmiCol = 'warning'; }
+      else { bmiC = 'Obesidade Grau III'; bmiCol = 'warning'; }
     }
     
     let bfC, bfCol;
     const bfNum = parseFloat(bf);
     
-    // Classificação de gordura corporal (Gallagher et al., 2000 / ACSM)
     if (sex === 'f') {
-      // Mulheres
       if (age <= 39) {
-        if (bfNum < 21) {
-          bfC = 'Baixo';
-          bfCol = 'attention';
-        } else if (bfNum <= 32.9) {
-          bfC = 'Adequado';
-          bfCol = 'normal';
-        } else if (bfNum <= 38.9) {
-          bfC = 'Moderadamente alto';
-          bfCol = 'attention';
-        } else {
-          bfC = 'Alto';
-          bfCol = 'warning';
-        }
+        if (bfNum < 21) { bfC = 'Baixo'; bfCol = 'attention'; }
+        else if (bfNum <= 32.9) { bfC = 'Adequado'; bfCol = 'normal'; }
+        else if (bfNum <= 38.9) { bfC = 'Moderadamente alto'; bfCol = 'attention'; }
+        else { bfC = 'Alto'; bfCol = 'warning'; }
       } else if (age <= 59) {
-        if (bfNum < 23) {
-          bfC = 'Baixo';
-          bfCol = 'attention';
-        } else if (bfNum <= 33.9) {
-          bfC = 'Adequado';
-          bfCol = 'normal';
-        } else if (bfNum <= 39.9) {
-          bfC = 'Moderadamente alto';
-          bfCol = 'attention';
-        } else {
-          bfC = 'Alto';
-          bfCol = 'warning';
-        }
+        if (bfNum < 23) { bfC = 'Baixo'; bfCol = 'attention'; }
+        else if (bfNum <= 33.9) { bfC = 'Adequado'; bfCol = 'normal'; }
+        else if (bfNum <= 39.9) { bfC = 'Moderadamente alto'; bfCol = 'attention'; }
+        else { bfC = 'Alto'; bfCol = 'warning'; }
       } else {
-        // 60 anos ou mais
-        if (bfNum < 24) {
-          bfC = 'Baixo';
-          bfCol = 'attention';
-        } else if (bfNum <= 35.9) {
-          bfC = 'Adequado';
-          bfCol = 'normal';
-        } else if (bfNum <= 41.9) {
-          bfC = 'Moderadamente alto';
-          bfCol = 'attention';
-        } else {
-          bfC = 'Alto';
-          bfCol = 'warning';
-        }
+        if (bfNum < 24) { bfC = 'Baixo'; bfCol = 'attention'; }
+        else if (bfNum <= 35.9) { bfC = 'Adequado'; bfCol = 'normal'; }
+        else if (bfNum <= 41.9) { bfC = 'Moderadamente alto'; bfCol = 'attention'; }
+        else { bfC = 'Alto'; bfCol = 'warning'; }
       }
     } else {
-      // Homens
       if (age <= 39) {
-        if (bfNum < 8) {
-          bfC = 'Baixo';
-          bfCol = 'attention';
-        } else if (bfNum <= 19.9) {
-          bfC = 'Adequado';
-          bfCol = 'normal';
-        } else if (bfNum <= 24.9) {
-          bfC = 'Moderadamente alto';
-          bfCol = 'attention';
-        } else {
-          bfC = 'Alto';
-          bfCol = 'warning';
-        }
+        if (bfNum < 8) { bfC = 'Baixo'; bfCol = 'attention'; }
+        else if (bfNum <= 19.9) { bfC = 'Adequado'; bfCol = 'normal'; }
+        else if (bfNum <= 24.9) { bfC = 'Moderadamente alto'; bfCol = 'attention'; }
+        else { bfC = 'Alto'; bfCol = 'warning'; }
       } else if (age <= 59) {
-        if (bfNum < 11) {
-          bfC = 'Baixo';
-          bfCol = 'attention';
-        } else if (bfNum <= 21.9) {
-          bfC = 'Adequado';
-          bfCol = 'normal';
-        } else if (bfNum <= 27.9) {
-          bfC = 'Moderadamente alto';
-          bfCol = 'attention';
-        } else {
-          bfC = 'Alto';
-          bfCol = 'warning';
-        }
+        if (bfNum < 11) { bfC = 'Baixo'; bfCol = 'attention'; }
+        else if (bfNum <= 21.9) { bfC = 'Adequado'; bfCol = 'normal'; }
+        else if (bfNum <= 27.9) { bfC = 'Moderadamente alto'; bfCol = 'attention'; }
+        else { bfC = 'Alto'; bfCol = 'warning'; }
       } else {
-        // 60 anos ou mais
-        if (bfNum < 13) {
-          bfC = 'Baixo';
-          bfCol = 'attention';
-        } else if (bfNum <= 24.9) {
-          bfC = 'Adequado';
-          bfCol = 'normal';
-        } else if (bfNum <= 29.9) {
-          bfC = 'Moderadamente alto';
-          bfCol = 'attention';
-        } else {
-          bfC = 'Alto';
-          bfCol = 'warning';
-        }
+        if (bfNum < 13) { bfC = 'Baixo'; bfCol = 'attention'; }
+        else if (bfNum <= 24.9) { bfC = 'Adequado'; bfCol = 'normal'; }
+        else if (bfNum <= 29.9) { bfC = 'Moderadamente alto'; bfCol = 'attention'; }
+        else { bfC = 'Alto'; bfCol = 'warning'; }
       }
     }
     
     results.bmiC = bmiC;
     results.bfC = bfC;
     
+    document.getElementById('r-name').textContent = appData.name;
+    document.getElementById('r-sex').textContent = sex === 'm' ? 'Masculino' : 'Feminino';
+    document.getElementById('r-age').textContent = age + ' anos';
+    document.getElementById('r-height').textContent = height + ' cm';
+    document.getElementById('r-weight').textContent = weight + ' kg';
+    document.getElementById('r-equation').textContent = appData.eq;
     document.getElementById('r-bmi').textContent = bmi;
     document.getElementById('r-bf').textContent = results.bf + '%';
     document.getElementById('r-fm').textContent = results.fm + ' kg';
     document.getElementById('r-ffm').textContent = results.ffm + ' kg';
+    document.getElementById('r-bmi-class').innerHTML = `<span class="classification ${bmiCol}">${bmiC}</span>`;
+    document.getElementById('r-bf-class').innerHTML = `<span class="classification ${bfCol}">${bfC}</span>`;
     
-    document.getElementById('r-bmi-class').innerHTML = '<span class="classification ' + bmiCol + '">' + bmiC + '</span>';
-    document.getElementById('r-bf-class').innerHTML = '<span class="classification ' + bfCol + '">' + bfC + '</span>';
-    
-    let interpretation = [];
-    
-    if (bmiCol === 'normal') {
-      interpretation.push('Seu IMC está dentro da faixa de peso normal, indicando equilíbrio entre peso e altura.');
-    } else if (bmiCol === 'warning') {
-      if (bmiC.includes('Obesidade')) {
-        interpretation.push('Seu IMC indica obesidade. É recomendável buscar orientação profissional para avaliação detalhada e planejamento adequado.');
-      } else {
-        interpretation.push('Seu IMC indica baixo peso. Considere consultar um profissional de saúde para avaliação nutricional.');
-      }
-    } else {
-      interpretation.push('Seu IMC indica sobrepeso. Atenção à alimentação e prática de atividade física podem ser benéficas.');
+    const fNames = {triceps: 'Tríceps', biceps: 'Bíceps', subscapular: 'Subescapular', suprailiac: 'Suprailíaca', chest: 'Peitoral', abdominal: 'Abdominal', thigh: 'Coxa'};
+    const fc = document.getElementById('r-folds-container');
+    fc.innerHTML = '';
+    for (let k in results.folds) {
+      const d = document.createElement('div');
+      d.className = 'result-item';
+      d.innerHTML = `<span class="result-label">${fNames[k]}</span><span class="result-value">${results.folds[k]} mm</span>`;
+      fc.appendChild(d);
     }
     
-    if (bfCol === 'normal') {
-      interpretation.push('Seu percentual de gordura corporal está dentro da faixa adequada para sua idade e sexo.');
-    } else if (bfCol === 'warning') {
-      interpretation.push('Seu percentual de gordura corporal está alto. Recomenda-se acompanhamento profissional para redução gradual e saudável.');
-    } else if (bfCol === 'attention') {
-      if (bfC === 'Baixo') {
-        interpretation.push('Seu percentual de gordura corporal está abaixo do recomendado. Considere avaliação nutricional especializada.');
-      } else {
-        interpretation.push('Seu percentual de gordura corporal está moderadamente elevado. Atenção aos hábitos alimentares e atividade física é importante.');
-      }
-    }
+    let interp = [];
+    if (bmiCol === 'normal') interp.push('Seu IMC está dentro da faixa de peso normal, indicando equilíbrio entre peso e altura.');
+    else if (bmiCol === 'warning') {
+      if (bmiC.includes('Obesidade')) interp.push('Seu IMC indica obesidade.');
+      else interp.push('Seu IMC indica baixo peso.');
+    } else interp.push('Seu IMC indica sobrepeso.');
     
-    results.interp = interpretation.join(' ');
+    if (bfCol === 'normal') interp.push('Seu percentual de gordura corporal está dentro da faixa adequada para sua idade e sexo.');
+    else if (bfCol === 'warning') interp.push('Seu percentual de gordura corporal está alto.');
+    else if (bfC === 'Baixo') interp.push('Seu percentual de gordura corporal está abaixo do recomendado.');
+    else interp.push('Seu percentual de gordura corporal está moderadamente elevado.');
     
-    document.getElementById('r-interp').innerHTML = '<strong>Interpretação:</strong><br>' + results.interp;
+    document.getElementById('r-interp').innerHTML = '<strong>Interpretação:</strong><br>' + interp.join(' ');
     
-    // Preencher informações do paciente na tela de resultados
-    document.getElementById('r-name').textContent = appData.name;
-    document.getElementById('r-sex').textContent = appData.sex === 'm' ? 'Masculino' : 'Feminino';
-    document.getElementById('r-age').textContent = appData.age + ' anos';
-    document.getElementById('r-height').textContent = appData.height + ' cm';
-    document.getElementById('r-weight').textContent = appData.weight + ' kg';
-    document.getElementById('r-equation').textContent = appData.eq;
+    // Adicionar gráfico de composição corporal ANTES da interpretação
+    const bfPercent = parseFloat(results.bf);
+    const ffmPercent = (100 - bfPercent).toFixed(1);
     
-    // Preencher dobras cutâneas medidas
-    const foldNames = {
-      triceps: 'Tríceps',
-      biceps: 'Bíceps',
-      subscapular: 'Subescapular',
-      suprailiac: 'Suprailíaca',
-      chest: 'Peitoral',
-      abdominal: 'Abdominal',
-      thigh: 'Coxa'
-    };
+    const chartHTML = `<div class="composition-chart">
+      <h3 style="color: #667eea; margin-bottom: 1rem; font-size: 1.15rem;">📊 Gráfico de Composição Corporal</h3>
+      <div class="chart-single-bar">
+        <div class="chart-segment fat" style="width: ${bfPercent}%">${results.bf}%</div>
+        <div class="chart-segment ffm" style="width: ${ffmPercent}%">${ffmPercent}%</div>
+      </div>
+      <div class="chart-legend">
+        <div class="legend-item">
+          <div class="legend-color fat"></div>
+          <span class="legend-text">Massa Gorda: ${results.bf}% (${results.fm} kg)</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color ffm"></div>
+          <span class="legend-text">Massa Livre de Gordura: ${ffmPercent}% (${results.ffm} kg)</span>
+        </div>
+      </div>
+    </div>`;
     
-    const foldsContainer = document.getElementById('r-folds-container');
-    foldsContainer.innerHTML = '';
+    // Inserir gráfico ANTES da interpretação
+    const bodyCompositionCard = document.getElementById('r-bf').closest('.result-card');
+    bodyCompositionCard.insertAdjacentHTML('afterend', chartHTML);
     
-    for (let key in results.folds) {
-      const div = document.createElement('div');
-      div.className = 'result-item';
-      div.innerHTML = '<span class="result-label">' + foldNames[key] + '</span>' +
-                     '<span class="result-value">' + results.folds[key] + ' mm</span>';
-      foldsContainer.appendChild(div);
-    }
+    // Adicionar referências científicas após interpretação
+    const referencesHTML = `<div class="references-section">
+      <h3>📚 Referências Científicas</h3>
+      <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Equação utilizada:</strong> ${appData.eq}</p></div>
+      <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Classificação do IMC (Adultos):</strong> World Health Organization (WHO). Obesity: Preventing and Managing the Global Epidemic. WHO Technical Report Series 894, Geneva, 2000.</p></div>
+      <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Classificação do IMC (Idosos):</strong> Lipschitz, D.A. Screening for nutritional status in the elderly. Primary Care, 21(1):55-67, 1994.</p></div>
+      <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Percentual de Gordura Corporal:</strong> Gallagher, D. et al. Healthy percentage body fat ranges: an approach for developing guidelines based on body mass index. American Journal of Clinical Nutrition, 72(3):694-701, 2000.</p></div>
+      <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Densidade Corporal:</strong> Siri, W.E. Body composition from fluid spaces and density: analysis of methods. Techniques for measuring body composition, 1956.</p></div>
+      <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Diretrizes Gerais:</strong> American College of Sports Medicine (ACSM). ACSM's Guidelines for Exercise Testing and Prescription, 11th Edition, 2021.</p></div>
+    </div>`;
+    
+    // Adicionar aviso legal
+    const disclaimerHTML = `<div class="disclaimer-box">
+      <p><strong>⚠️ Aviso Legal:</strong> Esta avaliação não substitui diagnóstico médico ou nutricional. Os resultados representam estimativas da composição corporal baseadas em equações de predição validadas cientificamente. Para orientação profissional individualizada, consulte um nutricionista ou médico especializado.</p>
+    </div>`;
+    
+    const interpDiv = document.getElementById('r-interp');
+    interpDiv.insertAdjacentHTML('afterend', referencesHTML);
+    interpDiv.nextElementSibling.insertAdjacentHTML('afterend', disclaimerHTML);
     
     goToScreen('results');
   }
   
-  function printReport() {
-    // Adicionar instruções antes de imprimir
-    const isWebView = navigator.userAgent.toLowerCase().indexOf('wv') > -1 || 
-                      navigator.userAgent.toLowerCase().indexOf('appgeyser') > -1;
-    
-    if (isWebView) {
-      const confirmPrint = confirm(
-        'Ao clicar em OK, a janela de impressão será aberta.\n\n' +
-        'Para salvar como PDF:\n' +
-        '1. Selecione "Salvar como PDF" ou "Imprimir em PDF"\n' +
-        '2. Escolha a pasta de destino\n' +
-        '3. Toque em "Salvar"\n\n' +
-        'O PDF será salvo na pasta Downloads do seu dispositivo.'
-      );
-      
-      if (!confirmPrint) {
-        return;
-      }
-    }
-    
-    // Abrir janela de impressão
-    window.print();
+  function encodeData(data) {
+    return btoa(unescape(encodeURIComponent(JSON.stringify(data))));
   }
   
-  function printReport() {
-    // Adicionar instruções antes de imprimir
-    const isWebView = navigator.userAgent.toLowerCase().indexOf('wv') > -1 || 
-                      navigator.userAgent.toLowerCase().indexOf('appgeyser') > -1;
+  function decodeData(encoded) {
+    try {
+      return JSON.parse(decodeURIComponent(escape(atob(encoded))));
+    } catch (e) {
+      return null;
+    }
+  }
+  
+  function checkSharedView() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const sharedData = urlParams.get('data');
     
-    if (isWebView) {
-      const confirmPrint = confirm(
-        'Ao clicar em OK, a janela de impressão será aberta.\n\n' +
-        'Para salvar como PDF:\n' +
-        '1. Selecione "Salvar como PDF" ou "Imprimir em PDF"\n' +
-        '2. Escolha a pasta de destino\n' +
-        '3. Toque em "Salvar"\n\n' +
-        'O PDF será salvo na pasta Downloads do seu dispositivo.'
-      );
-      
-      if (!confirmPrint) {
-        return;
+    if (sharedData) {
+      const data = decodeData(sharedData);
+      if (data) {
+        displaySharedResults(data);
+        return true;
       }
     }
+    return false;
+  }
+  
+  function displaySharedResults(data) {
+    document.getElementById('home').style.display = 'none';
+    document.getElementById('info').style.display = 'none';
+    document.getElementById('folds').style.display = 'none';
     
-    // Abrir janela de impressão
-    window.print();
+    // Preencher informações
+    document.getElementById('r-name').textContent = data.name;
+    document.getElementById('r-sex').textContent = data.sex === 'm' ? 'Masculino' : 'Feminino';
+    document.getElementById('r-age').textContent = data.age + ' anos';
+    document.getElementById('r-height').textContent = data.height + ' cm';
+    document.getElementById('r-weight').textContent = data.weight + ' kg';
+    document.getElementById('r-equation').textContent = data.equation;
+    
+    // Preencher dobras
+    const fNames = {triceps: 'Tríceps', biceps: 'Bíceps', subscapular: 'Subescapular', suprailiac: 'Suprailíaca', chest: 'Peitoral', abdominal: 'Abdominal', thigh: 'Coxa'};
+    const fc = document.getElementById('r-folds-container');
+    fc.innerHTML = '';
+    for (let k in data.folds) {
+      const d = document.createElement('div');
+      d.className = 'result-item';
+      d.innerHTML = `<span class="result-label">${fNames[k]}</span><span class="result-value">${data.folds[k]} mm</span>`;
+      fc.appendChild(d);
+    }
+    
+    // Preencher resultados - IMC
+    document.getElementById('r-bmi').textContent = data.bmi;
+    document.getElementById('r-bmi-class').innerHTML = `<span class="classification ${data.bmiCol}">${data.bmiC}</span>`;
+    
+    // Preencher resultados - Composição Corporal
+    document.getElementById('r-bf').textContent = data.bf + '%';
+    document.getElementById('r-bf-class').innerHTML = `<span class="classification ${data.bfCol}">${data.bfC}</span>`;
+    document.getElementById('r-fm').textContent = data.fm + ' kg';
+    document.getElementById('r-ffm').textContent = data.ffm + ' kg';
+    
+    // Adicionar gráfico ANTES da interpretação
+    const bfPercent = parseFloat(data.bf);
+    const ffmPercent = (100 - bfPercent).toFixed(1);
+    
+    const chartHTML = `<div class="composition-chart">
+      <h3 style="color: #667eea; margin-bottom: 1rem; font-size: 1.15rem;">📊 Gráfico de Composição Corporal</h3>
+      <div class="chart-single-bar">
+        <div class="chart-segment fat" style="width: ${bfPercent}%">${data.bf}%</div>
+        <div class="chart-segment ffm" style="width: ${ffmPercent}%">${ffmPercent}%</div>
+      </div>
+      <div class="chart-legend">
+        <div class="legend-item">
+          <div class="legend-color fat"></div>
+          <span class="legend-text">Massa Gorda: ${data.bf}% (${data.fm} kg)</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color ffm"></div>
+          <span class="legend-text">Massa Livre de Gordura: ${ffmPercent}% (${data.ffm} kg)</span>
+        </div>
+      </div>
+    </div>`;
+    
+    // Inserir gráfico ANTES da interpretação
+    const bodyCompositionCard = document.getElementById('r-bf').closest('.result-card');
+    bodyCompositionCard.insertAdjacentHTML('afterend', chartHTML);
+    
+    // Interpretação
+    document.getElementById('r-interp').innerHTML = '<strong>Interpretação:</strong><br>' + data.interp;
+    
+    // Adicionar referências científicas após interpretação
+    const referencesHTML = `<div class="references-section">
+      <h3>📚 Referências Científicas</h3>
+      <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Equação utilizada:</strong> ${data.equation}</p></div>
+      <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Classificação do IMC (Adultos):</strong> World Health Organization (WHO). Obesity: Preventing and Managing the Global Epidemic. WHO Technical Report Series 894, Geneva, 2000.</p></div>
+      <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Classificação do IMC (Idosos):</strong> Lipschitz, D.A. Screening for nutritional status in the elderly. Primary Care, 21(1):55-67, 1994.</p></div>
+      <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Percentual de Gordura Corporal:</strong> Gallagher, D. et al. Healthy percentage body fat ranges: an approach for developing guidelines based on body mass index. American Journal of Clinical Nutrition, 72(3):694-701, 2000.</p></div>
+      <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Densidade Corporal:</strong> Siri, W.E. Body composition from fluid spaces and density: analysis of methods. Techniques for measuring body composition, 1956.</p></div>
+      <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Diretrizes Gerais:</strong> American College of Sports Medicine (ACSM). ACSM's Guidelines for Exercise Testing and Prescription, 11th Edition, 2021.</p></div>
+    </div>`;
+    
+    // Adicionar aviso legal
+    const disclaimerHTML = `<div class="disclaimer-box">
+      <p><strong>⚠️ Aviso Legal:</strong> Esta avaliação não substitui diagnóstico médico ou nutricional. Os resultados representam estimativas da composição corporal baseadas em equações de predição validadas cientificamente. Para orientação profissional individualizada, consulte um nutricionista ou médico especializado.</p>
+    </div>`;
+    
+    const interpDiv = document.getElementById('r-interp');
+    interpDiv.insertAdjacentHTML('afterend', referencesHTML);
+    interpDiv.nextElementSibling.insertAdjacentHTML('afterend', disclaimerHTML);
+    
+    // Ocultar botão de compartilhar e adicionar botão PDF
+    document.getElementById('btn-share-link').style.display = 'none';
+    document.getElementById('btn-new').style.display = 'none';
+    
+    const resultsDiv = document.getElementById('results');
+    const btnPdf = document.createElement('button');
+    btnPdf.className = 'btn';
+    btnPdf.style.background = 'linear-gradient(135deg, #059669 0%, #047857 100%)';
+    btnPdf.innerHTML = '💾 Salvar como PDF';
+    btnPdf.onclick = () => window.print();
+    resultsDiv.appendChild(btnPdf);
+    
+    const btnNewEval = document.createElement('button');
+    btnNewEval.className = 'btn btn-secondary';
+    btnNewEval.innerHTML = '🆕 Fazer Minha Avaliação';
+    btnNewEval.onclick = () => {
+      window.location.href = window.location.origin + window.location.pathname;
+    };
+    resultsDiv.appendChild(btnNewEval);
+    
+    document.getElementById('results').classList.add('active');
+  }
+  
+  function generateShareLink() {
+    // Gerar interpretação completa
+    let interp = [];
+    const bmiCol = results.bmiC.includes('Obesidade') || results.bmiC === 'Baixo peso' ? 'warning' : results.bmiC === 'Sobrepeso' ? 'attention' : 'normal';
+    const bfCol = results.bfC === 'Adequado' ? 'normal' : results.bfC === 'Alto' ? 'warning' : 'attention';
+    
+    if (bmiCol === 'normal') interp.push('Seu IMC está dentro da faixa de peso normal, indicando equilíbrio entre peso e altura.');
+    else if (bmiCol === 'warning') {
+      if (results.bmiC.includes('Obesidade')) interp.push('Seu IMC indica obesidade.');
+      else interp.push('Seu IMC indica baixo peso.');
+    } else interp.push('Seu IMC indica sobrepeso.');
+    
+    if (bfCol === 'normal') interp.push('Seu percentual de gordura corporal está dentro da faixa adequada para sua idade e sexo.');
+    else if (bfCol === 'warning') interp.push('Seu percentual de gordura corporal está alto.');
+    else if (results.bfC === 'Baixo') interp.push('Seu percentual de gordura corporal está abaixo do recomendado.');
+    else interp.push('Seu percentual de gordura corporal está moderadamente elevado.');
+    
+    const shareData = {
+      name: appData.name,
+      sex: appData.sex,
+      age: appData.age,
+      height: appData.height,
+      weight: appData.weight,
+      equation: appData.eq,
+      folds: results.folds,
+      bmi: results.bmi,
+      bf: results.bf,
+      fm: results.fm,
+      ffm: results.ffm,
+      bmiC: results.bmiC,
+      bfC: results.bfC,
+      bmiCol: bmiCol,
+      bfCol: bfCol,
+      interp: interp.join(' ')
+    };
+    
+    const encoded = encodeData(shareData);
+    const shareLink = 'https://feeducauel2019-svg.github.io/BodyCheck1/?data=' + encoded;
+    
+    document.getElementById('share-link-input').value = shareLink;
+    document.getElementById('share-modal').classList.add('show');
+  }
+  
+  function copyShareLink() {
+    const input = document.getElementById('share-link-input');
+    input.select();
+    input.setSelectionRange(0, 99999);
+    
+    try {
+      document.execCommand('copy');
+      alert('✅ Link copiado! Agora você pode colar e compartilhar em qualquer aplicativo.');
+    } catch (err) {
+      navigator.clipboard.writeText(input.value).then(() => {
+        alert('✅ Link copiado! Agora você pode colar e compartilhar em qualquer aplicativo.');
+      }).catch(() => {
+        alert('❌ Não foi possível copiar automaticamente. Por favor, selecione e copie o link manualmente.');
+      });
+    }
   }
   
   document.addEventListener('DOMContentLoaded', function() {
     // Verificar se é visualização compartilhada
     if (checkSharedView()) {
-      return; // Se for visualização compartilhada, não inicializar app normal
+      return;
     }
     
-    // Event listener para mudança de idioma
-    document.getElementById('lang').addEventListener('change', function() {
-      currentLang = this.value;
-      updateLanguage();
-    });
+    document.getElementById('btn-start').addEventListener('click', () => goToScreen('info'));
     
-    document.getElementById('btn-start').addEventListener('click', function() {
-      goToScreen('info');
-    });
-    
-    const sexOptions = document.querySelectorAll('.radio-option');
-    for (let i = 0; i < sexOptions.length; i++) {
-      sexOptions[i].addEventListener('click', function() {
-        const value = this.getAttribute('data-sex');
-        selectSex(this, value);
+    document.querySelectorAll('.radio-option').forEach(opt => {
+      opt.addEventListener('click', function() {
+        selectSex(this, this.getAttribute('data-sex'));
       });
-    }
+    });
     
-    document.getElementById('btn-continue').addEventListener('click', function() {
+    document.getElementById('btn-continue').addEventListener('click', () => {
       if (validateInfo()) {
         setupFolds();
         goToScreen('folds');
       }
     });
     
-    document.getElementById('btn-back-info').addEventListener('click', function() {
-      goToScreen('home');
-    });
+    document.getElementById('btn-back-info').addEventListener('click', () => goToScreen('home'));
+    document.getElementById('btn-calculate').addEventListener('click', calculate);
+    document.getElementById('btn-back-folds').addEventListener('click', () => goToScreen('info'));
     
-    document.getElementById('btn-calculate').addEventListener('click', function() {
-      calculate();
-    });
-    
-    document.getElementById('btn-back-folds').addEventListener('click', function() {
-      goToScreen('info');
-    });
-    
-    document.getElementById('btn-share-link').addEventListener('click', function() {
-      generateShareLink();
-    });
-    
-    document.getElementById('btn-copy-link').addEventListener('click', function() {
-      copyShareLink();
-    });
-    
-    document.getElementById('btn-close-modal').addEventListener('click', function() {
+    document.getElementById('btn-share-link').addEventListener('click', generateShareLink);
+    document.getElementById('btn-copy-link').addEventListener('click', copyShareLink);
+    document.getElementById('btn-close-modal').addEventListener('click', () => {
       document.getElementById('share-modal').classList.remove('show');
     });
     
-    document.getElementById('btn-new').addEventListener('click', function() {
-      // Se for visualização compartilhada, recarregar página
-      if (document.querySelector('.app').classList.contains('shared-view')) {
-        window.location.href = window.location.origin + window.location.pathname;
-        return;
-      }
-      
-      appData = {
-        name: '',
-        sex: '',
-        age: 0,
-        height: 0,
-        weight: 0,
-        eq: '',
-        foldIds: []
-      };
+    document.getElementById('btn-new').addEventListener('click', () => {
+      appData = {name: '', sex: '', age: 0, height: 0, weight: 0, eq: '', foldIds: []};
       results = {};
       currentFolds = {};
-      
       document.getElementById('name').value = '';
       document.getElementById('age').value = '';
       document.getElementById('height').value = '';
       document.getElementById('weight').value = '';
-      
-      const sexOptions = document.querySelectorAll('.radio-option');
-      for (let i = 0; i < sexOptions.length; i++) {
-        sexOptions[i].classList.remove('selected');
-      }
-      
+      document.querySelectorAll('.radio-option').forEach(o => o.classList.remove('selected'));
       goToScreen('home');
     });
   });
-  
 })();
 </script>
 </body>

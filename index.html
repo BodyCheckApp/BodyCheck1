@@ -1080,7 +1080,12 @@ body {
     btnPdf.onclick = () => window.print();
     resultsDiv.appendChild(btnPdf);
     
-    document.getElementById('results').classList.add('active');
+    // Remove aviso legal caso exista (modo link compartilhado)
+document.querySelectorAll('.disclaimer-box').forEach(el => el.remove());
+
+// Exibe resultados
+document.getElementById('results').classList.add('active');
+
   }
   
   function generateShareLink() {

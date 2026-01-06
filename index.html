@@ -1148,16 +1148,17 @@ document.getElementById('results').classList.add('active');
     input.select();
     input.setSelectionRange(0, 99999);
     
-    try {
-      document.execCommand('copy');
-      alert('✅ Link copiado! Agora você pode colar e compartilhar em qualquer aplicativo.');
-    } catch (err) {
-      navigator.clipboard.writeText(input.value).then(() => {
-        alert('✅ Link copiado! Agora você pode colar e compartilhar em qualquer aplicativo.');
-      }).catch(() => {
-        alert('❌ Não foi possível copiar automaticamente. Por favor, selecione e copie o link manualmente.');
-      });
-    }
+   try {
+  document.execCommand('copy');
+  // Link copiado com sucesso (alert removido)
+} catch (err) {
+  navigator.clipboard.writeText(input.value).then(() => {
+    // Link copiado com sucesso (alert removido)
+  }).catch(() => {
+    // Não foi possível copiar automaticamente
+    // alert removido, você pode escolher mostrar uma mensagem no HTML se quiser
+  });
+}
   }
   
   document.addEventListener('DOMContentLoaded', function() {

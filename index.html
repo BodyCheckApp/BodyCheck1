@@ -796,7 +796,7 @@ function calculate() {
 
   appData.foldIds.forEach(id => {
     const val = parseFloat(document.getElementById('f-' + id).value);
-    if (!val || val < 1 || val > 100) valid = false;
+    if (isNaN(val) || val < 1 || val > 100) valid = false;
     else currentFolds[id] = val;
   });
 
@@ -834,378 +834,147 @@ function calculate() {
   const ffm = weight - fm;
 
   results = {bmi, bf: bf.toFixed(1), fm: fm.toFixed(1), ffm: ffm.toFixed(1), folds: {...currentFolds}};
-    
-    let bmiC, bmiCol;
-    if (age >= 60) {
-      if (bmi < 22) { bmiC = 'Baixo peso'; bmiCol = 'warning'; }
-      else if (bmi < 27) { bmiC = 'Peso adequado'; bmiCol = 'normal'; }
-      else if (bmi < 30) { bmiC = 'Sobrepeso'; bmiCol = 'attention'; }
-      else if (bmi < 35) { bmiC = 'Obesidade Grau I'; bmiCol = 'warning'; }
-      else if (bmi < 40) { bmiC = 'Obesidade Grau II'; bmiCol = 'warning'; }
-      else { bmiC = 'Obesidade Grau III'; bmiCol = 'warning'; }
+
+  // classificação IMC
+  let bmiC, bmiCol;
+  if (age >= 60) {
+    if (bmi < 22) { bmiC = 'Baixo peso'; bmiCol = 'warning'; }
+    else if (bmi < 27) { bmiC = 'Peso adequado'; bmiCol = 'normal'; }
+    else if (bmi < 30) { bmiC = 'Sobrepeso'; bmiCol = 'attention'; }
+    else if (bmi < 35) { bmiC = 'Obesidade Grau I'; bmiCol = 'warning'; }
+    else if (bmi < 40) { bmiC = 'Obesidade Grau II'; bmiCol = 'warning'; }
+    else { bmiC = 'Obesidade Grau III'; bmiCol = 'warning'; }
+  } else {
+    if (bmi < 18.5) { bmiC = 'Baixo peso'; bmiCol = 'warning'; }
+    else if (bmi <= 24.9) { bmiC = 'Peso normal'; bmiCol = 'normal'; }
+    else if (bmi <= 29.9) { bmiC = 'Sobrepeso'; bmiCol = 'attention'; }
+    else if (bmi <= 34.9) { bmiC = 'Obesidade Grau I'; bmiCol = 'warning'; }
+    else if (bmi <= 39.9) { bmiC = 'Obesidade Grau II'; bmiCol = 'warning'; }
+    else { bmiC = 'Obesidade Grau III'; bmiCol = 'warning'; }
+  }
+
+  // classificação %gordura
+  let bfC, bfCol;
+  const bfNum = parseFloat(bf);
+
+  if (sex === 'f') {
+    if (age <= 39) {
+      if (bfNum < 21) { bfC = 'Baixo'; bfCol = 'attention'; }
+      else if (bfNum <= 32.9) { bfC = 'Adequado'; bfCol = 'normal'; }
+      else if (bfNum <= 38.9) { bfC = 'Moderadamente alto'; bfCol = 'attention'; }
+      else { bfC = 'Alto'; bfCol = 'warning'; }
+    } else if (age <= 59) {
+      if (bfNum < 23) { bfC = 'Baixo'; bfCol = 'attention'; }
+      else if (bfNum <= 33.9) { bfC = 'Adequado'; bfCol = 'normal'; }
+      else if (bfNum <= 39.9) { bfC = 'Moderadamente alto'; bfCol = 'attention'; }
+      else { bfC = 'Alto'; bfCol = 'warning'; }
     } else {
-      if (bmi < 18.5) { bmiC = 'Baixo peso'; bmiCol = 'warning'; }
-      else if (bmi <= 24.9) { bmiC = 'Peso normal'; bmiCol = 'normal'; }
-      else if (bmi <= 29.9) { bmiC = 'Sobrepeso'; bmiCol = 'attention'; }
-      else if (bmi <= 34.9) { bmiC = 'Obesidade Grau I'; bmiCol = 'warning'; }
-      else if (bmi <= 39.9) { bmiC = 'Obesidade Grau II'; bmiCol = 'warning'; }
-      else { bmiC = 'Obesidade Grau III'; bmiCol = 'warning'; }
+      if (bfNum < 24) { bfC = 'Baixo'; bfCol = 'attention'; }
+      else if (bfNum <= 35.9) { bfC = 'Adequado'; bfCol = 'normal'; }
+      else if (bfNum <= 41.9) { bfC = 'Moderadamente alto'; bfCol = 'attention'; }
+      else { bfC = 'Alto'; bfCol = 'warning'; }
     }
-    
-    let bfC, bfCol;
-    const bfNum = parseFloat(bf);
-    
-    if (sex === 'f') {
-      if (age <= 39) {
-        if (bfNum < 21) { bfC = 'Baixo'; bfCol = 'attention'; }
-        else if (bfNum <= 32.9) { bfC = 'Adequado'; bfCol = 'normal'; }
-        else if (bfNum <= 38.9) { bfC = 'Moderadamente alto'; bfCol = 'attention'; }
-        else { bfC = 'Alto'; bfCol = 'warning'; }
-      } else if (age <= 59) {
-        if (bfNum < 23) { bfC = 'Baixo'; bfCol = 'attention'; }
-        else if (bfNum <= 33.9) { bfC = 'Adequado'; bfCol = 'normal'; }
-        else if (bfNum <= 39.9) { bfC = 'Moderadamente alto'; bfCol = 'attention'; }
-        else { bfC = 'Alto'; bfCol = 'warning'; }
-      } else {
-        if (bfNum < 24) { bfC = 'Baixo'; bfCol = 'attention'; }
-        else if (bfNum <= 35.9) { bfC = 'Adequado'; bfCol = 'normal'; }
-        else if (bfNum <= 41.9) { bfC = 'Moderadamente alto'; bfCol = 'attention'; }
-        else { bfC = 'Alto'; bfCol = 'warning'; }
-      }
+  } else {
+    if (age <= 39) {
+      if (bfNum < 8) { bfC = 'Baixo'; bfCol = 'attention'; }
+      else if (bfNum <= 19.9) { bfC = 'Adequado'; bfCol = 'normal'; }
+      else if (bfNum <= 24.9) { bfC = 'Moderadamente alto'; bfCol = 'attention'; }
+      else { bfC = 'Alto'; bfCol = 'warning'; }
+    } else if (age <= 59) {
+      if (bfNum < 11) { bfC = 'Baixo'; bfCol = 'attention'; }
+      else if (bfNum <= 21.9) { bfC = 'Adequado'; bfCol = 'normal'; }
+      else if (bfNum <= 27.9) { bfC = 'Moderadamente alto'; bfCol = 'attention'; }
+      else { bfC = 'Alto'; bfCol = 'warning'; }
     } else {
-      if (age <= 39) {
-        if (bfNum < 8) { bfC = 'Baixo'; bfCol = 'attention'; }
-        else if (bfNum <= 19.9) { bfC = 'Adequado'; bfCol = 'normal'; }
-        else if (bfNum <= 24.9) { bfC = 'Moderadamente alto'; bfCol = 'attention'; }
-        else { bfC = 'Alto'; bfCol = 'warning'; }
-      } else if (age <= 59) {
-        if (bfNum < 11) { bfC = 'Baixo'; bfCol = 'attention'; }
-        else if (bfNum <= 21.9) { bfC = 'Adequado'; bfCol = 'normal'; }
-        else if (bfNum <= 27.9) { bfC = 'Moderadamente alto'; bfCol = 'attention'; }
-        else { bfC = 'Alto'; bfCol = 'warning'; }
-      } else {
-        if (bfNum < 13) { bfC = 'Baixo'; bfCol = 'attention'; }
-        else if (bfNum <= 24.9) { bfC = 'Adequado'; bfCol = 'normal'; }
-        else if (bfNum <= 29.9) { bfC = 'Moderadamente alto'; bfCol = 'attention'; }
-        else { bfC = 'Alto'; bfCol = 'warning'; }
-      }
-    }
-    
-    results.bmiC = bmiC;
-    results.bfC = bfC;
-    
-    document.getElementById('r-name').textContent = appData.name;
-    document.getElementById('r-sex').textContent = sex === 'm' ? 'Masculino' : 'Feminino';
-    document.getElementById('r-age').textContent = age + ' anos';
-    document.getElementById('r-height').textContent = height + ' cm';
-    document.getElementById('r-weight').textContent = weight + ' kg';
-    document.getElementById('r-equation').textContent = appData.eq;
-    document.getElementById('r-bmi').textContent = bmi;
-    document.getElementById('r-bf').textContent = results.bf + '%';
-    document.getElementById('r-fm').textContent = results.fm + ' kg';
-    document.getElementById('r-ffm').textContent = results.ffm + ' kg';
-    document.getElementById('r-bmi-class').innerHTML = `<span class="classification ${bmiCol}">${bmiC}</span>`;
-    document.getElementById('r-bf-class').innerHTML = `<span class="classification ${bfCol}">${bfC}</span>`;
-    
-    const fNames = {triceps: 'Tríceps', biceps: 'Bíceps', subscapular: 'Subescapular', suprailiac: 'Suprailíaca', chest: 'Peitoral', abdominal: 'Abdominal', thigh: 'Coxa'};
-    const fc = document.getElementById('r-folds-container');
-    fc.innerHTML = '';
-    for (let k in results.folds) {
-      const d = document.createElement('div');
-      d.className = 'result-item';
-      d.innerHTML = `<span class="result-label">${fNames[k]}</span><span class="result-value">${results.folds[k]} mm</span>`;
-      fc.appendChild(d);
-    }
-    
-    let interp = [];
-    if (bmiCol === 'normal') interp.push('Seu IMC está dentro da faixa de peso normal, indicando equilíbrio entre peso e altura.');
-    else if (bmiCol === 'warning') {
-      if (bmiC.includes('Obesidade')) interp.push('Seu IMC indica obesidade.');
-      else interp.push('Seu IMC indica baixo peso.');
-    } else interp.push('Seu IMC indica sobrepeso.');
-    
-    if (bfCol === 'normal') interp.push('Seu percentual de gordura corporal está dentro da faixa adequada para sua idade e sexo.');
-    else if (bfCol === 'warning') interp.push('Seu percentual de gordura corporal está alto.');
-    else if (bfC === 'Baixo') interp.push('Seu percentual de gordura corporal está abaixo do recomendado.');
-    else interp.push('Seu percentual de gordura corporal está moderadamente elevado.');
-    
-    document.getElementById('r-interp').innerHTML = '<strong>Interpretação:</strong><br>' + interp.join(' ');
-    
-    // Adicionar gráfico de composição corporal ANTES da interpretação
-    const bfPercent = parseFloat(results.bf);
-    const ffmPercent = (100 - bfPercent).toFixed(1);
-    
-    const chartHTML = `<div class="composition-chart">
-      <h3 style="color: #1e4fa3; margin-bottom: 1rem; font-size: 1.15rem;">Gráfico de Composição Corporal</h3>
-      <div class="chart-single-bar">
-        <div class="chart-segment fat" style="width: ${bfPercent}%">${results.bf}%</div>
-        <div class="chart-segment ffm" style="width: ${ffmPercent}%">${ffmPercent}%</div>
-      </div>
-      <div class="chart-legend">
-        <div class="legend-item">
-          <div class="legend-color fat"></div>
-          <span class="legend-text">Massa Gorda: ${results.bf}% (${results.fm} kg)</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-color ffm"></div>
-          <span class="legend-text">Massa Livre de Gordura: ${ffmPercent}% (${results.ffm} kg)</span>
-        </div>
-      </div>
-    </div>`;
-    
-    // Inserir gráfico ANTES da interpretação
-    const bodyCompositionCard = document.getElementById('r-bf').closest('.result-card');
-    bodyCompositionCard.insertAdjacentHTML('afterend', chartHTML);
-    
-    // Adicionar referências científicas após interpretação
-    const referencesHTML = `<div class="references-section">
-      <h3>Referências Científicas</h3>
-      <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Equação utilizada:</strong> ${appData.eq}</p></div>
-      <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Classificação do IMC (Adultos):</strong> World Health Organization (WHO). Obesity: Preventing and Managing the Global Epidemic. WHO Technical Report Series 894, Geneva, 2000.</p></div>
-      <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Classificação do IMC (Idosos):</strong> Lipschitz, D.A. Screening for nutritional status in the elderly. Primary Care, 21(1):55-67, 1994.</p></div>
-      <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Percentual de Gordura Corporal:</strong> Gallagher, D. et al. Healthy percentage body fat ranges: an approach for developing guidelines based on body mass index. American Journal of Clinical Nutrition, 72(3):694-701, 2000.</p></div>
-      <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Densidade Corporal:</strong> Siri, W.E. Body composition from fluid spaces and density: analysis of methods. Techniques for measuring body composition, 1956.</p></div>
-      <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Diretrizes Gerais:</strong> American College of Sports Medicine (ACSM). ACSM's Guidelines for Exercise Testing and Prescription, 11th Edition, 2021.</p></div>
-    </div>`;
-        
-    const interpDiv = document.getElementById('r-interp');
-    interpDiv.insertAdjacentHTML('afterend', referencesHTML);
-        
-    goToScreen('results');
-  }
-  
-  function encodeData(data) {
-    return btoa(unescape(encodeURIComponent(JSON.stringify(data))));
-  }
-  
-  function decodeData(encoded) {
-    try {
-      return JSON.parse(decodeURIComponent(escape(atob(encoded))));
-    } catch (e) {
-      return null;
+      if (bfNum < 13) { bfC = 'Baixo'; bfCol = 'attention'; }
+      else if (bfNum <= 24.9) { bfC = 'Adequado'; bfCol = 'normal'; }
+      else if (bfNum <= 29.9) { bfC = 'Moderadamente alto'; bfCol = 'attention'; }
+      else { bfC = 'Alto'; bfCol = 'warning'; }
     }
   }
-  
-  function checkSharedView() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const sharedData = urlParams.get('data');
-    
-    if (sharedData) {
-      const data = decodeData(sharedData);
-      if (data) {
-        displaySharedResults(data);
-        return true;
-      }
-    }
-    return false;
+
+  results.bmiC = bmiC;
+  results.bfC = bfC;
+
+  // Atualizar tela
+  document.getElementById('r-name').textContent = appData.name;
+  document.getElementById('r-sex').textContent = sex === 'm' ? 'Masculino' : 'Feminino';
+  document.getElementById('r-age').textContent = age + ' anos';
+  document.getElementById('r-height').textContent = height + ' cm';
+  document.getElementById('r-weight').textContent = weight + ' kg';
+  document.getElementById('r-equation').textContent = appData.eq;
+  document.getElementById('r-bmi').textContent = bmi;
+  document.getElementById('r-bf').textContent = results.bf + '%';
+  document.getElementById('r-fm').textContent = results.fm + ' kg';
+  document.getElementById('r-ffm').textContent = results.ffm + ' kg';
+  document.getElementById('r-bmi-class').innerHTML = `<span class="classification ${bmiCol}">${bmiC}</span>`;
+  document.getElementById('r-bf-class').innerHTML = `<span class="classification ${bfCol}">${bfC}</span>`;
+
+  // Atualizar dobras
+  const fNames = {triceps: 'Tríceps', biceps: 'Bíceps', subscapular: 'Subescapular', suprailiac: 'Suprailíaca', chest: 'Peitoral', abdominal: 'Abdominal', thigh: 'Coxa'};
+  const fc = document.getElementById('r-folds-container');
+  fc.innerHTML = '';
+  for (let k in results.folds) {
+    const d = document.createElement('div');
+    d.className = 'result-item';
+    d.innerHTML = `<span class="result-label">${fNames[k]}</span><span class="result-value">${results.folds[k]} mm</span>`;
+    fc.appendChild(d);
   }
-  
-  function displaySharedResults(data) {
-    document.getElementById('home').style.display = 'none';
-    document.getElementById('info').style.display = 'none';
-    document.getElementById('folds').style.display = 'none';
-    
-    // Preencher informações
-    document.getElementById('r-name').textContent = data.name;
-    document.getElementById('r-sex').textContent = data.sex === 'm' ? 'Masculino' : 'Feminino';
-    document.getElementById('r-age').textContent = data.age + ' anos';
-    document.getElementById('r-height').textContent = data.height + ' cm';
-    document.getElementById('r-weight').textContent = data.weight + ' kg';
-    document.getElementById('r-equation').textContent = data.equation;
-    
-    // Preencher dobras
-    const fNames = {triceps: 'Tríceps', biceps: 'Bíceps', subscapular: 'Subescapular', suprailiac: 'Suprailíaca', chest: 'Peitoral', abdominal: 'Abdominal', thigh: 'Coxa'};
-    const fc = document.getElementById('r-folds-container');
-    fc.innerHTML = '';
-    for (let k in data.folds) {
-      const d = document.createElement('div');
-      d.className = 'result-item';
-      d.innerHTML = `<span class="result-label">${fNames[k]}</span><span class="result-value">${data.folds[k]} mm</span>`;
-      fc.appendChild(d);
-    }
-    
-    // Preencher resultados - IMC
-    document.getElementById('r-bmi').textContent = data.bmi;
-    document.getElementById('r-bmi-class').innerHTML = `<span class="classification ${data.bmiCol}">${data.bmiC}</span>`;
-    
-    // Preencher resultados - Composição Corporal
-    document.getElementById('r-bf').textContent = data.bf + '%';
-    document.getElementById('r-bf-class').innerHTML = `<span class="classification ${data.bfCol}">${data.bfC}</span>`;
-    document.getElementById('r-fm').textContent = data.fm + ' kg';
-    document.getElementById('r-ffm').textContent = data.ffm + ' kg';
-    
-    // Adicionar gráfico ANTES da interpretação
-    const bfPercent = parseFloat(data.bf);
-    const ffmPercent = (100 - bfPercent).toFixed(1);
-    
-    const chartHTML = `<div class="composition-chart">
-      <h3 style="color: #1e4fa3; margin-bottom: 1rem; font-size: 1.15rem;">📊 Gráfico de Composição Corporal</h3>
-      <div class="chart-single-bar">
-        <div class="chart-segment fat" style="width: ${bfPercent}%">${data.bf}%</div>
-        <div class="chart-segment ffm" style="width: ${ffmPercent}%">${ffmPercent}%</div>
+
+  // Interpretação
+  let interp = [];
+  if (bmiCol === 'normal') interp.push('Seu IMC está dentro da faixa de peso normal, indicando equilíbrio entre peso e altura.');
+  else if (bmiCol === 'warning') interp.push(bmiC.includes('Obesidade') ? 'Seu IMC indica obesidade.' : 'Seu IMC indica baixo peso.');
+  else interp.push('Seu IMC indica sobrepeso.');
+
+  if (bfCol === 'normal') interp.push('Seu percentual de gordura corporal está dentro da faixa adequada para sua idade e sexo.');
+  else if (bfCol === 'warning') interp.push('Seu percentual de gordura corporal está alto.');
+  else if (bfC === 'Baixo') interp.push('Seu percentual de gordura corporal está abaixo do recomendado.');
+  else interp.push('Seu percentual de gordura corporal está moderadamente elevado.');
+
+  document.getElementById('r-interp').innerHTML = '<strong>Interpretação:</strong><br>' + interp.join(' ');
+
+  // Adicionar gráfico
+  const chartExisting = document.querySelector('.composition-chart');
+  if (chartExisting) chartExisting.remove();
+  const bfPercent = parseFloat(results.bf);
+  const ffmPercent = (100 - bfPercent).toFixed(1);
+
+  const chartHTML = `<div class="composition-chart">
+    <h3 style="color: #1e4fa3; margin-bottom: 1rem; font-size: 1.15rem;">Gráfico de Composição Corporal</h3>
+    <div class="chart-single-bar">
+      <div class="chart-segment fat" style="width: ${bfPercent}%">${results.bf}%</div>
+      <div class="chart-segment ffm" style="width: ${ffmPercent}%">${ffmPercent}%</div>
+    </div>
+    <div class="chart-legend">
+      <div class="legend-item">
+        <div class="legend-color fat"></div>
+        <span class="legend-text">Massa Gorda: ${results.bf}% (${results.fm} kg)</span>
       </div>
-      <div class="chart-legend">
-        <div class="legend-item">
-          <div class="legend-color fat"></div>
-          <span class="legend-text">Massa Gorda: ${data.bf}% (${data.fm} kg)</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-color ffm"></div>
-          <span class="legend-text">Massa Livre de Gordura: ${ffmPercent}% (${data.ffm} kg)</span>
-        </div>
+      <div class="legend-item">
+        <div class="legend-color ffm"></div>
+        <span class="legend-text">Massa Livre de Gordura: ${ffmPercent}% (${results.ffm} kg)</span>
       </div>
-    </div>`;
-    
-    // Inserir gráfico ANTES da interpretação
-    const bodyCompositionCard = document.getElementById('r-bf').closest('.result-card');
-    bodyCompositionCard.insertAdjacentHTML('afterend', chartHTML);
-    
-    // Interpretação
-    document.getElementById('r-interp').innerHTML = '<strong>Interpretação:</strong><br>' + data.interp;
-    
-    // Adicionar referências científicas após interpretação
-    const referencesHTML = `<div class="references-section">
-      <h3>📚 Referências Científicas</h3>
-      <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Equação utilizada:</strong> ${data.equation}</p></div>
-      <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Classificação do IMC (Adultos):</strong> World Health Organization (WHO). Obesity: Preventing and Managing the Global Epidemic. WHO Technical Report Series 894, Geneva, 2000.</p></div>
-      <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Classificação do IMC (Idosos):</strong> Lipschitz, D.A. Screening for nutritional status in the elderly. Primary Care, 21(1):55-67, 1994.</p></div>
-      <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Percentual de Gordura Corporal:</strong> Gallagher, D. et al. Healthy percentage body fat ranges: an approach for developing guidelines based on body mass index. American Journal of Clinical Nutrition, 72(3):694-701, 2000.</p></div>
-      <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Densidade Corporal:</strong> Siri, W.E. Body composition from fluid spaces and density: analysis of methods. Techniques for measuring body composition, 1956.</p></div>
-      <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Diretrizes Gerais:</strong> American College of Sports Medicine (ACSM). ACSM's Guidelines for Exercise Testing and Prescription, 11th Edition, 2021.</p></div>
-    </div>`;
-    
-    // Adicionar aviso legal
-    const disclaimerHTML = `<div class="disclaimer-box">
-      <p><strong>⚠️ Aviso Legal:</strong> Esta avaliação não substitui diagnóstico médico ou nutricional. Os resultados representam estimativas da composição corporal baseadas em equações de predição validadas cientificamente. Para orientação profissional individualizada, consulte um nutricionista ou médico especializado.</p>
-    </div>`;
-    
-    const interpDiv = document.getElementById('r-interp');
-    interpDiv.insertAdjacentHTML('afterend', referencesHTML);
-    interpDiv.nextElementSibling.insertAdjacentHTML('afterend', disclaimerHTML);
-    
-    // Ocultar botão de compartilhar e adicionar botão PDF
-    document.getElementById('btn-share-link').style.display = 'none';
-    document.getElementById('btn-new').style.display = 'none';
-    
+    </div>
+  </div>`;
+  const bodyCompositionCard = document.getElementById('r-bf').closest('.result-card');
+  bodyCompositionCard.insertAdjacentHTML('afterend', chartHTML);
+
+  // Mostrar tela de resultados
+  goToScreen('results');
+
+  // Adicionar botão PDF apenas se ainda não existir
+  if (!document.getElementById('btn-pdf')) {
     const resultsDiv = document.getElementById('results');
     const btnPdf = document.createElement('button');
+    btnPdf.id = 'btn-pdf';
     btnPdf.className = 'btn';
     btnPdf.style.background = '#0b2e5f';
     btnPdf.innerHTML = 'Salvar como PDF';
     btnPdf.onclick = () => window.print();
     resultsDiv.appendChild(btnPdf);
-    
-    // Remove aviso legal caso exista (modo link compartilhado)
-document.querySelectorAll('.disclaimer-box').forEach(el => el.remove());
-
-// Exibe resultados
-document.getElementById('results').classList.add('active');
-
-goToScreen('results');
-
   }
-  
-  function generateShareLink() {
-    // Gerar interpretação completa
-    let interp = [];
-    const bmiCol = results.bmiC.includes('Obesidade') || results.bmiC === 'Baixo peso' ? 'warning' : results.bmiC === 'Sobrepeso' ? 'attention' : 'normal';
-    const bfCol = results.bfC === 'Adequado' ? 'normal' : results.bfC === 'Alto' ? 'warning' : 'attention';
-    
-    if (bmiCol === 'normal') interp.push('Seu IMC está dentro da faixa de peso normal, indicando equilíbrio entre peso e altura.');
-    else if (bmiCol === 'warning') {
-      if (results.bmiC.includes('Obesidade')) interp.push('Seu IMC indica obesidade.');
-      else interp.push('Seu IMC indica baixo peso.');
-    } else interp.push('Seu IMC indica sobrepeso.');
-    
-    if (bfCol === 'normal') interp.push('Seu percentual de gordura corporal está dentro da faixa adequada para sua idade e sexo.');
-    else if (bfCol === 'warning') interp.push('Seu percentual de gordura corporal está alto.');
-    else if (results.bfC === 'Baixo') interp.push('Seu percentual de gordura corporal está abaixo do recomendado.');
-    else interp.push('Seu percentual de gordura corporal está moderadamente elevado.');
-    
-    const shareData = {
-      name: appData.name,
-      sex: appData.sex,
-      age: appData.age,
-      height: appData.height,
-      weight: appData.weight,
-      equation: appData.eq,
-      folds: results.folds,
-      bmi: results.bmi,
-      bf: results.bf,
-      fm: results.fm,
-      ffm: results.ffm,
-      bmiC: results.bmiC,
-      bfC: results.bfC,
-      bmiCol: bmiCol,
-      bfCol: bfCol,
-      interp: interp.join(' ')
-    };
-    
-    const encoded = encodeData(shareData);
-    const shareLink = 'https://feeducauel2019-svg.github.io/BodyCheck1/?data=' + encoded;
-    
-    document.getElementById('share-link-input').value = shareLink;
-    document.getElementById('share-modal').classList.add('show');
-  }
-  
-  function copyShareLink() {
-    const input = document.getElementById('share-link-input');
-    input.select();
-    input.setSelectionRange(0, 99999);
-    
-    try {
-      document.execCommand('copy');
-      alert('✅ Link copiado! Agora você pode colar e compartilhar em qualquer aplicativo.');
-    } catch (err) {
-      navigator.clipboard.writeText(input.value).then(() => {
-        alert('✅ Link copiado! Agora você pode colar e compartilhar em qualquer aplicativo.');
-      }).catch(() => {
-        alert('❌ Não foi possível copiar automaticamente. Por favor, selecione e copie o link manualmente.');
-      });
-    }
-  }
-  
-  document.addEventListener('DOMContentLoaded', function() {
-    // Verificar se é visualização compartilhada
-    if (checkSharedView()) {
-      return;
-    }
-    
-    document.getElementById('btn-start').addEventListener('click', () => goToScreen('info'));
-    
-    document.querySelectorAll('.radio-option').forEach(opt => {
-      opt.addEventListener('click', function() {
-        selectSex(this, this.getAttribute('data-sex'));
-      });
-    });
-    
-    document.getElementById('btn-continue').addEventListener('click', () => {
-      if (validateInfo()) {
-        setupFolds();
-        goToScreen('folds');
-      }
-    });
-    
-    document.getElementById('btn-back-info').addEventListener('click', () => goToScreen('home'));
-    document.getElementById('btn-calculate').addEventListener('click', calculate);
-    document.getElementById('btn-back-folds').addEventListener('click', () => goToScreen('info'));
-    
-    document.getElementById('btn-share-link').addEventListener('click', generateShareLink);
-    document.getElementById('btn-copy-link').addEventListener('click', copyShareLink);
-    document.getElementById('btn-close-modal').addEventListener('click', () => {
-      document.getElementById('share-modal').classList.remove('show');
-    });
-    
-    document.getElementById('btn-new').addEventListener('click', () => {
-      appData = {name: '', sex: '', age: 0, height: 0, weight: 0, eq: '', foldIds: []};
-      results = {};
-      currentFolds = {};
-      document.getElementById('name').value = '';
-      document.getElementById('age').value = '';
-      document.getElementById('height').value = '';
-      document.getElementById('weight').value = '';
-      document.querySelectorAll('.radio-option').forEach(o => o.classList.remove('selected'));
-      goToScreen('home');
+}
     });
   });
 })();

@@ -525,6 +525,21 @@ body {
 </style>
 </head>
 <body>
+
+<script>
+(function blockDesktop() {
+  const isMobile =
+    /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|Mobile/i.test(navigator.userAgent) ||
+    (navigator.maxTouchPoints && navigator.maxTouchPoints > 1);
+
+  if (!isMobile) {
+    document.body.innerHTML = '';
+    document.body.style.background = '#0b2e5f';
+    throw new Error('Desktop access blocked');
+  }
+})();
+</script>
+
 <div class="app">
   <div class="header">
     <h1>BodyCheck</h1>

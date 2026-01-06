@@ -527,25 +527,28 @@ body {
 <body>
 
 <script>
-(function blockDesktop() {
+(function hardBlockDesktop() {
+
+  const ua = navigator.userAgent.toLowerCase();
+
+  const isDesktopOS =
+    ua.includes('windows nt') ||
+    ua.includes('macintosh') ||
+    ua.includes('linux x86_64');
 
   const hasTouch =
-    navigator.maxTouchPoints &&
-    navigator.maxTouchPoints > 1;
+    'ontouchstart' in window ||
+    (navigator.maxTouchPoints && navigator.maxTouchPoints > 1);
 
-  const isFinePointer = window.matchMedia('(pointer: fine)').matches;
-
-  // Desktop = mouse como input principal
-  if (isFinePointer && !hasTouch) {
+  // Desktop OS sem touch real → bloqueia
+  if (isDesktopOS && !hasTouch) {
     document.body.innerHTML = '';
     document.body.style.background = '#0b2e5f';
-    throw new Error('Desktop blocked');
+    while (true) {} // trava execução
   }
 
 })();
 </script>
-
-
 
 <div class="app">
   <div class="header">

@@ -1187,7 +1187,10 @@ document.getElementById('results').classList.add('active');
       document.getElementById('weight').value = '';
       document.querySelectorAll('.radio-option').forEach(o => o.classList.remove('selected'));
       goToScreen('home');
-    });
+      
+     }); // fecha DOMContentLoaded
+})(); // fecha a IIFE
+
 
 </script>
 </body> 

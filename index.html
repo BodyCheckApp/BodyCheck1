@@ -707,11 +707,11 @@ body {
     const height = parseFloat(document.getElementById('height').value);
     const weight = parseFloat(document.getElementById('weight').value);
     
-    if (!name) { alert('Digite o nome completo'); return false; }
-    if (!appData.sex) { alert('Selecione o sexo'); return false; }
-    if (!age || age < 5 || age > 120) { alert('Idade inválida (5-120 anos)'); return false; }
-    if (!height || height < 50 || height > 250) { alert('Altura inválida (50-250 cm)'); return false; }
-    if (!weight || weight < 10 || weight > 300) { alert('Peso inválido (10-300 kg)'); return false; }
+    if (!name) { showModal('Digite o nome completo'); return false; }
+    if (!appData.sex) { showModal('Selecione o sexo'); return false; }
+    if (!age || age < 5 || age > 120) { showModal('Idade inválida (5-120 anos)'); return false; }
+    if (!height || height < 50 || height > 250) { showModal('Altura inválida (50-250 cm)'); return false; }
+    if (!weight || weight < 10 || weight > 300) { showModal('Peso inválido (10-300 kg)'); return false; }
     
     appData.name = name;
     appData.age = age;
@@ -788,7 +788,7 @@ body {
       else currentFolds[id] = val;
     });
     
-    if (!valid) { alert('Digite todas as medidas (1-100 mm)'); return; }
+    if (!valid) { showModal('Digite todas as medidas (1-100 mm)'); return; }
     
     const {sex, age, height, weight} = appData;
     const h = height / 100;
@@ -1136,12 +1136,12 @@ document.getElementById('results').classList.add('active');
     
     try {
       document.execCommand('copy');
-      alert('✅ Link copiado! Agora você pode colar e compartilhar em qualquer aplicativo.');
+      showModal('✅ Link copiado! Agora você pode colar e compartilhar em qualquer aplicativo.');
     } catch (err) {
       navigator.clipboard.writeText(input.value).then(() => {
-        alert('✅ Link copiado! Agora você pode colar e compartilhar em qualquer aplicativo.');
+        showModal('✅ Link copiado! Agora você pode colar e compartilhar em qualquer aplicativo.');
       }).catch(() => {
-        alert('❌ Não foi possível copiar automaticamente. Por favor, selecione e copie o link manualmente.');
+        showModal('❌ Não foi possível copiar automaticamente. Por favor, selecione e copie o link manualmente.');
       });
     }
   }
@@ -1190,6 +1190,29 @@ document.getElementById('results').classList.add('active');
     });
   });
 })();
+<script>
+  /* ===== SEU JAVASCRIPT EXISTENTE FICA AQUI ===== */
+  /* NÃO apague nada do que você já tem acima */
+
+  function showModal(message) {
+    document.getElementById("modal-message").textContent = message;
+    document.getElementById("app-modal").classList.add("show");
+  }
+
+  function closeModal() {
+    document.getElementById("app-modal").classList.remove("show");
+  }
+
+  /* ===== FIM DO SEU JAVASCRIPT ===== */
 </script>
+
+<!-- MODAL INTERNO (substitui alert e não mostra o site) -->
+<div id="app-modal" class="app-modal">
+  <div class="app-modal-box">
+    <p id="modal-message"></p>
+    <button class="btn" onclick="closeModal()">OK</button>
+  </div>
+</div>
+
 </body>
 </html>

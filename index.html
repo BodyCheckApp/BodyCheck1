@@ -1190,57 +1190,6 @@ document.getElementById('results').classList.add('active');
     });
   });
 })();
-<script>
-    /* ===== FUNÇÕES DO MODAL ===== */
-  function showModal(message) {
-    document.getElementById("modal-message").textContent = message;
-    document.getElementById("app-modal").classList.add("show");
-  }
-
-  function closeModal() {
-    document.getElementById("app-modal").classList.remove("show");
-  }
-
-  document.addEventListener('DOMContentLoaded', function () {
-
-    document.getElementById('btn-start')?.addEventListener('click', () => {
-      goToScreen('info');
-    });
-
-    document.getElementById('btn-back-info')?.addEventListener('click', () => {
-      goToScreen('home');
-    });
-
-    document.getElementById('btn-continue')?.addEventListener('click', () => {
-      if (validateInfo()) {
-        setupFolds();
-        goToScreen('folds');
-      }
-    });
-
-    document.getElementById('btn-back-folds')?.addEventListener('click', () => {
-      goToScreen('info');
-    });
-
-    document.getElementById('btn-calculate')?.addEventListener('click', () => {
-      calculate();
-    });
-
-    document.getElementById('btn-new')?.addEventListener('click', () => {
-      location.reload();
-    });
-
-  });
-
 </script>
-
-<!-- MODAL INTERNO (substitui alert e não mostra o site) -->
-<div id="app-modal" class="app-modal">
-  <div class="app-modal-box">
-    <p id="modal-message"></p>
-    <button class="btn" onclick="closeModal()">OK</button>
-  </div>
-</div>
-
-</body>
+</body> 
 </html>

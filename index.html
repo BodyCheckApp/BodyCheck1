@@ -538,24 +538,7 @@ body {
         <p>O aplicativo utiliza medidas de dobras cutâneas para a estimativa de diferentes componentes da composição corporal, como gordura corporal e massa magra, empregando equações preditivas amplamente utilizadas na literatura científica, provenientes de estudos validados em diferentes populações.</p>
         <p>A plataforma realiza a aplicação automática das fórmulas, reduzindo erros de cálculo e otimizando o tempo do avaliador. Após a inserção das medidas, o BodyCheck gera relatórios organizados e de fácil interpretação, contribuindo para uma avaliação mais precisa.</p>
       </div>
-      <div id="toast" style="
-  display: none;
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #0b2e5f;
-  color: #fff;
-  padding: 1rem 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  z-index: 10000;
-  font-weight: 600;
-  text-align: center;
-  max-width: 90%;
-  font-size: 0.95rem;
-">Link copiado! Agora você pode compartilhar ou colar no navegador para salvar o PDF.</div>
-
+      
       <button class="btn" id="btn-start">Iniciar Avaliação</button>
     </div>
 
@@ -1167,30 +1150,13 @@ document.getElementById('results').classList.add('active');
     
     try {
       document.execCommand('copy');
-      // Função para mostrar toast
-function showToast(message, duration = 3000) {
-  const toast = document.getElementById('toast');
-  toast.textContent = message;
-  toast.style.display = 'block';
-  toast.style.opacity = '1';
-  
-  setTimeout(() => {
-    toast.style.transition = 'opacity 0.5s';
-    toast.style.opacity = '0';
-    setTimeout(() => toast.style.display = 'none', 500);
-  }, duration);
-}
-
-// Substituindo o alert
-document.getElementById('btn-copy-link').addEventListener('click', () => {
-  const input = document.getElementById('share-link-input');
-  input.select();
-  input.setSelectionRange(0, 99999);
-  navigator.clipboard.writeText(input.value).then(() => {
-    showToast('Link copiado! Agora você pode compartilhar ou colar no navegador para salvar o PDF.');
-  });
-});
-
+      alert('✅ Link copiado! Agora você pode colar e compartilhar em qualquer aplicativo.');
+    } catch (err) {
+      navigator.clipboard.writeText(input.value).then(() => {
+        alert('✅ Link copiado! Agora você pode colar e compartilhar em qualquer aplicativo.');
+      }).catch(() => {
+        alert('❌ Não foi possível copiar automaticamente. Por favor, selecione e copie o link manualmente.');
+      });
     }
   }
   

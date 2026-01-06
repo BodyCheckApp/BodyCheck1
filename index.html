@@ -576,8 +576,9 @@ body {
         <label>Peso Corporal (kg)</label>
         <input type="number" id="weight" placeholder="Digite o peso" step="0.1" min="10" max="300">
       </div>
-      
+      <div id="info-error" style="color: #dc2626; margin-bottom: 1rem; display: none;"></div>
       <button class="btn" id="btn-continue">Continuar</button>
+
       <button class="btn back-btn" id="btn-back-info">Voltar</button>
     </div>
 
@@ -587,6 +588,7 @@ body {
       
       <div id="fold-inputs"></div>
       
+      <div id="fold-error" style="color: #dc2626; margin-bottom: 1rem; display: none;"></div>
       <button class="btn" id="btn-calculate">Calcular</button>
       <button class="btn back-btn" id="btn-back-folds">Voltar</button>
     </div>
@@ -701,24 +703,30 @@ body {
     appData.sex = val;
   }
   
-  function validateInfo() {
-    const name = document.getElementById('name').value.trim();
-    const age = parseFloat(document.getElementById('age').value);
-    const height = parseFloat(document.getElementById('height').value);
-    const weight = parseFloat(document.getElementById('weight').value);
-    
-    if (!name) { alert('Digite o nome completo'); return false; }
-    if (!appData.sex) { alert('Selecione o sexo'); return false; }
-    if (!age || age < 5 || age > 120) { alert('Idade inválida (5-120 anos)'); return false; }
-    if (!height || height < 50 || height > 250) { alert('Altura inválida (50-250 cm)'); return false; }
-    if (!weight || weight < 10 || weight > 300) { alert('Peso inválido (10-300 kg)'); return false; }
-    
-    appData.name = name;
-    appData.age = age;
-    appData.height = height;
-    appData.weight = weight;
-    return true;
-  }
+function validateInfo() {
+  const name = document.getElementById('name').value.trim();
+  const age = parseFloat(document.getElementById('age').value);
+  const height = parseFloat(document.getElementById('height').value);
+  const weight = parseFloat(document.getElementById('weight').value);
+  const errorDiv = document.getElementById('info-error');
+
+  // Resetar mensagem
+  errorDiv.style.display = 'none';
+  errorDiv.textContent = '';
+
+  if (!name) { errorDiv.textContent = 'Digite o nome completo'; errorDiv.style.display = 'block'; return false; }
+  if (!appData.sex) { errorDiv.textContent = 'Selecione o sexo'; errorDiv.style.display = 'block'; return false; }
+  if (!age || age < 5 || age > 120) { errorDiv.textContent = 'Idade inválida (5-120 anos)'; errorDiv.style.display = 'block'; return false; }
+  if (!height || height < 50 || height > 250) { errorDiv.textContent = 'Altura inválida (50-250 cm)'; errorDiv.style.display = 'block'; return false; }
+  if (!weight || weight < 10 || weight > 300) { errorDiv.textContent = 'Peso inválido (10-300 kg)'; errorDiv.style.display = 'block'; return false; }
+
+  appData.name = name;
+  appData.age = age;
+  appData.height = height;
+  appData.weight = weight;
+  return true;
+}
+
   
   function setupFolds() {
     const {sex, age} = appData;
@@ -778,45 +786,54 @@ body {
     }, 100);
   }
   
-  function calculate() {
-    currentFolds = {};
-    let valid = true;
-    
-    appData.foldIds.forEach(id => {
-      const val = parseFloat(document.getElementById('f-' + id).value);
-      if (!val || val < 1 || val > 100) valid = false;
-      else currentFolds[id] = val;
-    });
-    
-    if (!valid) { alert('Digite todas as medidas (1-100 mm)'); return; }
-    
-    const {sex, age, height, weight} = appData;
-    const h = height / 100;
-    const bmi = (weight / (h * h)).toFixed(1);
-    let bd, bf;
-    
-    if (age <= 17) {
-      const sum = currentFolds.triceps + currentFolds.subscapular;
-      bf = sex === 'm' ? 0.735 * sum + 1.0 : 0.610 * sum + 5.1;
-    } else if (age <= 59) {
-      if (sex === 'm') {
-        const sum = currentFolds.chest + currentFolds.abdominal + currentFolds.thigh;
-        bd = 1.10938 - (0.0008267 * sum) + (0.0000016 * sum * sum) - (0.0002574 * age);
-      } else {
-        const sum = currentFolds.triceps + currentFolds.suprailiac + currentFolds.thigh;
-        bd = 1.0994921 - (0.0009929 * sum) + (0.0000023 * sum * sum) - (0.0001392 * age);
-      }
-      bf = ((4.95 / bd) - 4.50) * 100;
+function calculate() {
+  const errorDiv = document.getElementById('folds-error');
+  errorDiv.style.display = 'none';
+  errorDiv.textContent = '';
+
+  currentFolds = {};
+  let valid = true;
+
+  appData.foldIds.forEach(id => {
+    const val = parseFloat(document.getElementById('f-' + id).value);
+    if (!val || val < 1 || val > 100) valid = false;
+    else currentFolds[id] = val;
+  });
+
+  if (!valid) {
+    errorDiv.textContent = 'Digite todas as medidas corretamente (1-100 mm).';
+    errorDiv.style.display = 'block';
+    return;
+  }
+
+  const {sex, age, height, weight} = appData;
+  const h = height / 100;
+  const bmi = (weight / (h * h)).toFixed(1);
+  let bd, bf;
+
+  // cálculo da gordura corporal
+  if (age <= 17) {
+    const sum = currentFolds.triceps + currentFolds.subscapular;
+    bf = sex === 'm' ? 0.735 * sum + 1.0 : 0.610 * sum + 5.1;
+  } else if (age <= 59) {
+    if (sex === 'm') {
+      const sum = currentFolds.chest + currentFolds.abdominal + currentFolds.thigh;
+      bd = 1.10938 - (0.0008267 * sum) + (0.0000016 * sum * sum) - (0.0002574 * age);
     } else {
-      const sum = currentFolds.triceps + currentFolds.biceps + currentFolds.subscapular + currentFolds.suprailiac;
-      bd = sex === 'm' ? 1.1765 - (0.0744 * Math.log10(sum)) : 1.1567 - (0.0717 * Math.log10(sum));
-      bf = ((4.95 / bd) - 4.50) * 100;
+      const sum = currentFolds.triceps + currentFolds.suprailiac + currentFolds.thigh;
+      bd = 1.0994921 - (0.0009929 * sum) + (0.0000023 * sum * sum) - (0.0001392 * age);
     }
-    
-    const fm = (bf / 100) * weight;
-    const ffm = weight - fm;
-    
-    results = {bmi, bf: bf.toFixed(1), fm: fm.toFixed(1), ffm: ffm.toFixed(1), folds: {...currentFolds}};
+    bf = ((4.95 / bd) - 4.50) * 100;
+  } else {
+    const sum = currentFolds.triceps + currentFolds.biceps + currentFolds.subscapular + currentFolds.suprailiac;
+    bd = sex === 'm' ? 1.1765 - (0.0744 * Math.log10(sum)) : 1.1567 - (0.0717 * Math.log10(sum));
+    bf = ((4.95 / bd) - 4.50) * 100;
+  }
+
+  const fm = (bf / 100) * weight;
+  const ffm = weight - fm;
+
+  results = {bmi, bf: bf.toFixed(1), fm: fm.toFixed(1), ffm: ffm.toFixed(1), folds: {...currentFolds}};
     
     let bmiC, bmiCol;
     if (age >= 60) {
@@ -1083,6 +1100,8 @@ document.querySelectorAll('.disclaimer-box').forEach(el => el.remove());
 
 // Exibe resultados
 document.getElementById('results').classList.add('active');
+
+goToScreen('results');
 
   }
   

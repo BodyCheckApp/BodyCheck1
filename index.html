@@ -557,7 +557,39 @@ body {
   </div>
   
   <div class="content">
-    <div id="home" class="screen active">
+    <div id="legal" class="screen active">
+  <h2 class="section-title">Aviso Legal & Política de Privacidade</h2>
+
+  <div class="about">
+    <p><strong>Aviso Legal</strong></p>
+    <p>
+      O <strong>BodyCheck</strong> é uma ferramenta educacional e de apoio à prática profissional,
+      destinada a profissionais e estudantes das áreas de Educação Física, Nutrição e Saúde.
+    </p>
+    <p>
+      Os resultados apresentados são <strong>estimativas</strong> baseadas em equações preditivas
+      validadas cientificamente e <strong>não substituem diagnóstico médico ou nutricional</strong>.
+    </p>
+    <p>
+      A interpretação final dos dados é de responsabilidade do profissional habilitado.
+    </p>
+
+    <p style="margin-top: 1rem;"><strong>Política de Privacidade</strong></p>
+    <p>
+      O BodyCheck <strong>não coleta, não armazena e não compartilha dados pessoais</strong>.
+      Todas as informações inseridas permanecem apenas no dispositivo do usuário.
+    </p>
+    <p>
+      Nenhum dado é enviado a servidores externos.
+    </p>
+  </div>
+
+  <button class="btn" id="btn-accept-legal">
+    Li e Aceito os Termos
+  </button>
+</div>
+
+    <div id="home" class="screen">
       <div class="about">
         <p>O <strong>BodyCheck</strong> é um aplicativo desenvolvido para a avaliação da composição corporal de crianças, adolescentes, adultos e idosos, de ambos os sexos, com foco em praticidade, sendo voltado para profissionais e estudantes da área da saúde, como Educação Física, Nutrição e áreas afins, auxiliando na prática profissional.</p>
         <p>O aplicativo utiliza medidas de dobras cutâneas para a estimativa de diferentes componentes da composição corporal, como gordura corporal e massa magra, empregando equações preditivas amplamente utilizadas na literatura científica, provenientes de estudos validados em diferentes populações.</p>
@@ -708,6 +740,29 @@ body {
   </div>
 </div>
 
+ <script>
+(function handleLegalScreen() {
+  const accepted = localStorage.getItem('bodycheck_legal_accepted');
+
+  if (accepted === 'true') {
+    // Já aceitou → pula direto para home
+    document.getElementById('legal')?.classList.remove('active');
+    document.getElementById('home')?.classList.add('active');
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('btn-accept-legal');
+    if (btn) {
+      btn.addEventListener('click', () => {
+        localStorage.setItem('bodycheck_legal_accepted', 'true');
+        document.getElementById('legal').classList.remove('active');
+        document.getElementById('home').classList.add('active');
+      });
+    }
+  });
+})();
+</script> 
+  
 <script>
 (function() {
   'use strict';

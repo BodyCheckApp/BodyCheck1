@@ -756,9 +756,9 @@ body {
     folds.forEach(f => {
       const div = document.createElement('div');
       div.className = 'input-group';
-      div.innerHTML = <label>${names[f].n} (mm) <span class="help-icon" data-help="h-${f}">?</span></label>
+      div.innerHTML = `<label>${names[f].n} (mm) <span class="help-icon" data-help="h-${f}">?</span></label>
         <input type="number" id="f-${f}" placeholder="Digite a medida" step="0.1" min="1" max="100">
-        <div id="h-${f}" class="help-popup"><strong>Como medir:</strong><br>${names[f].d}</div>;
+        <div id="h-${f}" class="help-popup"><strong>Como medir:</strong><br>${names[f].d}</div>`;
       c.appendChild(div);
     });
     
@@ -887,8 +887,8 @@ body {
     document.getElementById('r-bf').textContent = results.bf + '%';
     document.getElementById('r-fm').textContent = results.fm + ' kg';
     document.getElementById('r-ffm').textContent = results.ffm + ' kg';
-    document.getElementById('r-bmi-class').innerHTML = <span class="classification ${bmiCol}">${bmiC}</span>;
-    document.getElementById('r-bf-class').innerHTML = <span class="classification ${bfCol}">${bfC}</span>;
+    document.getElementById('r-bmi-class').innerHTML = `<span class="classification ${bmiCol}">${bmiC}</span>`;
+    document.getElementById('r-bf-class').innerHTML = `<span class="classification ${bfCol}">${bfC}</span>`;
     
     const fNames = {triceps: 'Tríceps', biceps: 'Bíceps', subscapular: 'Subescapular', suprailiac: 'Suprailíaca', chest: 'Peitoral', abdominal: 'Abdominal', thigh: 'Coxa'};
     const fc = document.getElementById('r-folds-container');
@@ -896,7 +896,7 @@ body {
     for (let k in results.folds) {
       const d = document.createElement('div');
       d.className = 'result-item';
-      d.innerHTML = <span class="result-label">${fNames[k]}</span><span class="result-value">${results.folds[k]} mm</span>;
+      d.innerHTML = `<span class="result-label">${fNames[k]}</span><span class="result-value">${results.folds[k]} mm</span>`;
       fc.appendChild(d);
     }
     
@@ -918,7 +918,7 @@ body {
     const bfPercent = parseFloat(results.bf);
     const ffmPercent = (100 - bfPercent).toFixed(1);
     
-    const chartHTML = <div class="composition-chart">
+    const chartHTML = `<div class="composition-chart">
       <h3 style="color: #1e4fa3; margin-bottom: 1rem; font-size: 1.15rem;">Gráfico de Composição Corporal</h3>
       <div class="chart-single-bar">
         <div class="chart-segment fat" style="width: ${bfPercent}%">${results.bf}%</div>
@@ -934,14 +934,14 @@ body {
           <span class="legend-text">Massa Livre de Gordura: ${ffmPercent}% (${results.ffm} kg)</span>
         </div>
       </div>
-    </div>;
+    </div>`;
     
     // Inserir gráfico ANTES da interpretação
     const bodyCompositionCard = document.getElementById('r-bf').closest('.result-card');
     bodyCompositionCard.insertAdjacentHTML('afterend', chartHTML);
     
     // Adicionar referências científicas após interpretação
-    const referencesHTML = <div class="references-section">
+    const referencesHTML = `<div class="references-section">
       <h3>Referências Científicas</h3>
       <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Equação utilizada:</strong> ${appData.eq}</p></div>
       <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Classificação do IMC (Adultos):</strong> World Health Organization (WHO). Obesity: Preventing and Managing the Global Epidemic. WHO Technical Report Series 894, Geneva, 2000.</p></div>
@@ -949,7 +949,7 @@ body {
       <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Percentual de Gordura Corporal:</strong> Gallagher, D. et al. Healthy percentage body fat ranges: an approach for developing guidelines based on body mass index. American Journal of Clinical Nutrition, 72(3):694-701, 2000.</p></div>
       <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Densidade Corporal:</strong> Siri, W.E. Body composition from fluid spaces and density: analysis of methods. Techniques for measuring body composition, 1956.</p></div>
       <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Diretrizes Gerais:</strong> American College of Sports Medicine (ACSM). ACSM's Guidelines for Exercise Testing and Prescription, 11th Edition, 2021.</p></div>
-    </div>;
+    </div>`;
         
     const interpDiv = document.getElementById('r-interp');
     interpDiv.insertAdjacentHTML('afterend', referencesHTML);
@@ -1003,17 +1003,17 @@ body {
     for (let k in data.folds) {
       const d = document.createElement('div');
       d.className = 'result-item';
-      d.innerHTML = <span class="result-label">${fNames[k]}</span><span class="result-value">${data.folds[k]} mm</span>;
+      d.innerHTML = `<span class="result-label">${fNames[k]}</span><span class="result-value">${data.folds[k]} mm</span>`;
       fc.appendChild(d);
     }
     
     // Preencher resultados - IMC
     document.getElementById('r-bmi').textContent = data.bmi;
-    document.getElementById('r-bmi-class').innerHTML = <span class="classification ${data.bmiCol}">${data.bmiC}</span>;
+    document.getElementById('r-bmi-class').innerHTML = `<span class="classification ${data.bmiCol}">${data.bmiC}</span>`;
     
     // Preencher resultados - Composição Corporal
     document.getElementById('r-bf').textContent = data.bf + '%';
-    document.getElementById('r-bf-class').innerHTML = <span class="classification ${data.bfCol}">${data.bfC}</span>;
+    document.getElementById('r-bf-class').innerHTML = `<span class="classification ${data.bfCol}">${data.bfC}</span>`;
     document.getElementById('r-fm').textContent = data.fm + ' kg';
     document.getElementById('r-ffm').textContent = data.ffm + ' kg';
     
@@ -1021,7 +1021,7 @@ body {
     const bfPercent = parseFloat(data.bf);
     const ffmPercent = (100 - bfPercent).toFixed(1);
     
-    const chartHTML = <div class="composition-chart">
+    const chartHTML = `<div class="composition-chart">
       <h3 style="color: #1e4fa3; margin-bottom: 1rem; font-size: 1.15rem;">📊 Gráfico de Composição Corporal</h3>
       <div class="chart-single-bar">
         <div class="chart-segment fat" style="width: ${bfPercent}%">${data.bf}%</div>
@@ -1037,7 +1037,7 @@ body {
           <span class="legend-text">Massa Livre de Gordura: ${ffmPercent}% (${data.ffm} kg)</span>
         </div>
       </div>
-    </div>;
+    </div>`;
     
     // Inserir gráfico ANTES da interpretação
     const bodyCompositionCard = document.getElementById('r-bf').closest('.result-card');
@@ -1047,7 +1047,7 @@ body {
     document.getElementById('r-interp').innerHTML = '<strong>Interpretação:</strong><br>' + data.interp;
     
     // Adicionar referências científicas após interpretação
-    const referencesHTML = <div class="references-section">
+    const referencesHTML = `<div class="references-section">
       <h3>📚 Referências Científicas</h3>
       <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Equação utilizada:</strong> ${data.equation}</p></div>
       <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Classificação do IMC (Adultos):</strong> World Health Organization (WHO). Obesity: Preventing and Managing the Global Epidemic. WHO Technical Report Series 894, Geneva, 2000.</p></div>
@@ -1055,12 +1055,12 @@ body {
       <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Percentual de Gordura Corporal:</strong> Gallagher, D. et al. Healthy percentage body fat ranges: an approach for developing guidelines based on body mass index. American Journal of Clinical Nutrition, 72(3):694-701, 2000.</p></div>
       <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Densidade Corporal:</strong> Siri, W.E. Body composition from fluid spaces and density: analysis of methods. Techniques for measuring body composition, 1956.</p></div>
       <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Diretrizes Gerais:</strong> American College of Sports Medicine (ACSM). ACSM's Guidelines for Exercise Testing and Prescription, 11th Edition, 2021.</p></div>
-    </div>;
+    </div>`;
     
     // Adicionar aviso legal
-    const disclaimerHTML = <div class="disclaimer-box">
+    const disclaimerHTML = `<div class="disclaimer-box">
       <p><strong>⚠️ Aviso Legal:</strong> Esta avaliação não substitui diagnóstico médico ou nutricional. Os resultados representam estimativas da composição corporal baseadas em equações de predição validadas cientificamente. Para orientação profissional individualizada, consulte um nutricionista ou médico especializado.</p>
-    </div>;
+    </div>`;
     
     const interpDiv = document.getElementById('r-interp');
     interpDiv.insertAdjacentHTML('afterend', referencesHTML);

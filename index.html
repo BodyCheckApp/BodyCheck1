@@ -527,24 +527,24 @@ body {
 <body>
 
 <script>
-(function hardBlockDesktop() {
+(function killDesktopExecution() {
 
   const ua = navigator.userAgent.toLowerCase();
 
-  const isDesktopOS =
+  const isDesktop =
     ua.includes('windows nt') ||
     ua.includes('macintosh') ||
     ua.includes('linux x86_64');
 
-  const hasTouch =
-    'ontouchstart' in window ||
-    (navigator.maxTouchPoints && navigator.maxTouchPoints > 1);
+  const isMobile =
+    ua.includes('android') ||
+    ua.includes('iphone') ||
+    ua.includes('ipad') ||
+    ua.includes('ipod');
 
-  // Desktop OS sem touch real → bloqueia
-  if (isDesktopOS && !hasTouch) {
-    document.body.innerHTML = '';
-    document.body.style.background = '#0b2e5f';
-    while (true) {} // trava execução
+  // Desktop de verdade → trava tudo
+  if (isDesktop && !isMobile) {
+    while (true) {}
   }
 
 })();

@@ -520,6 +520,18 @@ body {
   .result-card, .composition-chart, .references-section, .disclaimer-box {
     page-break-inside: avoid;
   }
+  .error-box {
+  display: none;
+  background: #fee2e2;
+  color: #991b1b;
+  padding: 14px;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
 }
 
 </style>
@@ -532,6 +544,7 @@ body {
   </div>
   
   <div class="content">
+    <div id="error-box" class="error-box"></div>
     <div id="home" class="screen active">
       <div class="about">
         <p>O <strong>BodyCheck</strong> é um aplicativo desenvolvido para a avaliação da composição corporal de crianças, adolescentes, adultos e idosos, de ambos os sexos, com foco em praticidade, sendo voltado para profissionais e estudantes da área da saúde, como Educação Física, Nutrição e áreas afins, auxiliando na prática profissional.</p>
@@ -684,16 +697,31 @@ body {
 <script>
 (function() {
   'use strict';
-  
+  function showError(msg) {
+  const box = document.getElementById('error-box');
+  if (!box) return;
+  box.textContent = msg;
+  box.style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function clearError() {
+  const box = document.getElementById('error-box');
+  if (!box) return;
+  box.style.display = 'none';
+  box.textContent = '';
+}
+
   let appData = {name: '', sex: '', age: 0, height: 0, weight: 0, eq: '', foldIds: []};
   let results = {};
   let currentFolds = {};
   
   function goToScreen(id) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    window.scrollTo(0, 0);
-  }
+  clearError();
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
   
   function selectSex(el, val) {
     document.querySelectorAll('.radio-option').forEach(o => o.classList.remove('selected'));
@@ -706,12 +734,13 @@ body {
     const age = parseFloat(document.getElementById('age').value);
     const height = parseFloat(document.getElementById('height').value);
     const weight = parseFloat(document.getElementById('weight').value);
-    
-    if (!name) { alert('Digite o nome completo'); return false; }
-    if (!appData.sex) { alert('Selecione o sexo'); return false; }
-    if (!age || age < 5 || age > 120) { alert('Idade inválida (5-120 anos)'); return false; }
-    if (!height || height < 50 || height > 250) { alert('Altura inválida (50-250 cm)'); return false; }
-    if (!weight || weight < 10 || weight > 300) { alert('Peso inválido (10-300 kg)'); return false; }
+   
+    clearError();
+    if (!name) { showError('Digite o nome completo'); return false; }
+    if (!appData.sex) { showError('Selecione o sexo'); return false; }
+    if (!age || age < 5 || age > 120) { showError('Idade inválida (5-120 anos)'); return false; }
+    if (!height || height < 50 || height > 250) { showError('Altura inválida (50-250 cm)'); return false; }
+    if (!weight || weight < 10 || weight > 300) { showError('Peso inválido (10-300 kg)'); return false; }
     
     appData.name = name;
     appData.age = age;
@@ -788,7 +817,7 @@ body {
       else currentFolds[id] = val;
     });
     
-    if (!valid) { alert('Digite todas as medidas (1-100 mm)'); return; }
+    if (!valid) { showError('Digite todas as medidas (1-100 mm)'); return; }
     
     const {sex, age, height, weight} = appData;
     const h = height / 100;
@@ -1136,12 +1165,12 @@ document.getElementById('results').classList.add('active');
     
     try {
       document.execCommand('copy');
-      alert('✅ Link copiado! Agora você pode colar e compartilhar em qualquer aplicativo.');
+      showError('✅ Link copiado! Agora você pode colar e compartilhar em qualquer aplicativo.');
     } catch (err) {
       navigator.clipboard.writeText(input.value).then(() => {
-        alert('✅ Link copiado! Agora você pode colar e compartilhar em qualquer aplicativo.');
+        showError('✅ Link copiado! Agora você pode colar e compartilhar em qualquer aplicativo.');
       }).catch(() => {
-        alert('❌ Não foi possível copiar automaticamente. Por favor, selecione e copie o link manualmente.');
+        showError('❌ Não foi possível copiar automaticamente. Por favor, selecione e copie o link manualmente.');
       });
     }
   }

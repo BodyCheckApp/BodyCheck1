@@ -520,6 +520,7 @@ body {
   .result-card, .composition-chart, .references-section, .disclaimer-box {
     page-break-inside: avoid;
   }
+  
   .error-box {
   display: none;
   background: #fee2e2;
@@ -537,6 +538,14 @@ body {
 </style>
 </head>
 <body>
+  
+<div id="error-box" class="error-box"></div>
+
+<section id="home">...</section>
+<section id="info">...</section>
+<section id="folds">...</section>
+
+
 <div class="app">
   <div class="header">
     <h1>BodyCheck</h1>
@@ -544,7 +553,6 @@ body {
   </div>
   
   <div class="content">
-    <div id="error-box" class="error-box"></div>
     <div id="home" class="screen active">
       <div class="about">
         <p>O <strong>BodyCheck</strong> é um aplicativo desenvolvido para a avaliação da composição corporal de crianças, adolescentes, adultos e idosos, de ambos os sexos, com foco em praticidade, sendo voltado para profissionais e estudantes da área da saúde, como Educação Física, Nutrição e áreas afins, auxiliando na prática profissional.</p>

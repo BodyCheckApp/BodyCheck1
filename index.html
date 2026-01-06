@@ -1191,9 +1191,7 @@ document.getElementById('results').classList.add('active');
   });
 })();
 <script>
-  /* ===== SEU JAVASCRIPT EXISTENTE FICA AQUI ===== */
-  /* NÃO apague nada do que você já tem acima */
-
+    /* ===== FUNÇÕES DO MODAL ===== */
   function showModal(message) {
     document.getElementById("modal-message").textContent = message;
     document.getElementById("app-modal").classList.add("show");
@@ -1203,7 +1201,37 @@ document.getElementById('results').classList.add('active');
     document.getElementById("app-modal").classList.remove("show");
   }
 
-  /* ===== FIM DO SEU JAVASCRIPT ===== */
+  document.addEventListener('DOMContentLoaded', function () {
+
+    document.getElementById('btn-start')?.addEventListener('click', () => {
+      goToScreen('info');
+    });
+
+    document.getElementById('btn-back-info')?.addEventListener('click', () => {
+      goToScreen('home');
+    });
+
+    document.getElementById('btn-continue')?.addEventListener('click', () => {
+      if (validateInfo()) {
+        setupFolds();
+        goToScreen('folds');
+      }
+    });
+
+    document.getElementById('btn-back-folds')?.addEventListener('click', () => {
+      goToScreen('info');
+    });
+
+    document.getElementById('btn-calculate')?.addEventListener('click', () => {
+      calculate();
+    });
+
+    document.getElementById('btn-new')?.addEventListener('click', () => {
+      location.reload();
+    });
+
+  });
+
 </script>
 
 <!-- MODAL INTERNO (substitui alert e não mostra o site) -->

@@ -796,7 +796,13 @@ function calculate() {
       else currentFolds[id] = val;
     });
     
-    if (!valid) { alert('Digite todas as medidas (1-100 mm)'); return; }
+    if (!valid) {
+  const foldError = document.getElementById('fold-error');
+  foldError.textContent = 'Digite todas as medidas corretamente (1-100 mm)';
+  foldError.style.display = 'block';
+  return;
+}
+
     
     const {sex, age, height, weight} = appData;
     const h = height / 100;

@@ -1150,13 +1150,9 @@ document.getElementById('results').classList.add('active');
     
    try {
   document.execCommand('copy');
-  // Link copiado com sucesso (alert removido)
 } catch (err) {
   navigator.clipboard.writeText(input.value).then(() => {
-    // Link copiado com sucesso (alert removido)
   }).catch(() => {
-    // Não foi possível copiar automaticamente
-    // alert removido, você pode escolher mostrar uma mensagem no HTML se quiser
   });
 }
   }

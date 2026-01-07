@@ -594,12 +594,12 @@ body {
 <p>
  <p>
   O <strong>BodyCheck</strong> é um aplicativo de apoio à avaliação da composição corporal,
-  voltado para profissionais e estudantes de Educação Física e Nutrição.
+  voltado para profissionais e estudantes de Educação Física, Nutrição e demais áreas da saúde.
 </p>
 
 <p>
   Utiliza dobras cutâneas e equações preditivas validadas para estimar gordura corporal
-  e massa magra, com resultados claros e automáticos.
+  e massa isenta de gordura, com resultados claros e automáticos.
 </p>
 
 </p>
@@ -757,7 +757,8 @@ body {
       </div>
       
       <div class="interpretation" id="r-interp"></div>
-      
+      <p><strong>Data da avaliação:</strong> <span id="result-date"></span></p>
+
       <button class="btn" id="btn-share-link">Gerar Link Compartilhável</button>
       <button class="btn btn-secondary" id="btn-new">Nova Avaliação</button>
       
@@ -802,6 +803,7 @@ body {
 </script> 
   
 <script>
+let evaluationDate = '';
 (function() {
   'use strict';
   
@@ -1068,7 +1070,8 @@ document.getElementById('r-evaluator-prof').textContent =
     else interp.push('Seu percentual de gordura corporal está moderadamente elevado.');
     
     document.getElementById('r-interp').innerHTML = '<strong>Interpretação:</strong><br>' + interp.join(' ');
-    
+    document.getElementById('result-date').textContent = evaluationDate;
+
     // Adicionar gráfico de composição corporal ANTES da interpretação
     const bfPercent = parseFloat(results.bf);
     const ffmPercent = (100 - bfPercent).toFixed(1);
@@ -1351,7 +1354,10 @@ document.getElementById('results').classList.add('active');
 })();
 
   document.getElementById('btn-start').addEventListener('click', () => {
-  goToScreen('info');
+ const today = new Date();
+evaluationDate = today.toLocaleDateString('pt-BR');
+goToScreen('info');
+
 });
 
 </script>

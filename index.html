@@ -534,7 +534,7 @@ body {
 <body>
 
 <script>
-(function killDesktopExecution() {
+(function blockDesktopAccess() {
 
   const ua = navigator.userAgent.toLowerCase();
 
@@ -549,13 +549,32 @@ body {
     ua.includes('ipad') ||
     ua.includes('ipod');
 
-  // Desktop de verdade → trava tudo
   if (isDesktop && !isMobile) {
-    while (true) {}
+    document.body.innerHTML = `
+      <div style="
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        height:100vh;
+        font-family:Arial, sans-serif;
+        text-align:center;
+        padding:20px;
+        background:#f7f7f7;
+        color:#333;
+      ">
+        <div>
+          <h2>Aplicação exclusiva para dispositivos móveis</h2>
+          <p>
+            Este sistema foi desenvolvido para uso apenas no aplicativo oficial.
+          </p>
+        </div>
+      </div>
+    `;
   }
 
 })();
 </script>
+
 
 <div class="app">
   <div class="header">

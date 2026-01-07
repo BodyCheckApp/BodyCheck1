@@ -131,6 +131,13 @@ body {
   background: #e5e7eb;
 }
 
+  .btn-small {
+  font-size: 12px;
+  padding: 6px 10px;
+  min-height: auto;
+  margin-bottom: 0.5rem;
+}
+
 .back-btn {
   background: transparent;
   color: #1e4fa3;
@@ -605,9 +612,13 @@ body {
 </p>
       </div>
       
-<button class="btn btn-secondary" id="btn-open-legal">
+<button
+  class="btn btn-secondary btn-small"
+  id="btn-open-legal"
+  onclick="goToScreen('legal')">
   Aviso Legal & Política de Privacidade
 </button>
+
 
 <div class="about">
   <p><strong>Identificação do Avaliador</strong></p>

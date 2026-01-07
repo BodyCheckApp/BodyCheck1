@@ -924,7 +924,8 @@ appData.evaluatorProf =
   }
   
 function calculate() {
-    currentFolds = {};
+  evaluationDate = new Date().toLocaleDateString('pt-BR');  
+  currentFolds = {};
     let valid = true;
     
     appData.foldIds.forEach(id => {
@@ -967,7 +968,14 @@ function calculate() {
     const fm = (bf / 100) * weight;
     const ffm = weight - fm;
     
-    results = {bmi, bf: bf.toFixed(1), fm: fm.toFixed(1), ffm: ffm.toFixed(1), folds: {...currentFolds}};
+    results = {
+  bmi,
+  bf: bf.toFixed(1),
+  fm: fm.toFixed(1),
+  ffm: ffm.toFixed(1),
+  folds: {...currentFolds},
+  evaluationDate: evaluationDate
+};
     
     let bmiC, bmiCol;
     if (age >= 60) {
@@ -1152,6 +1160,9 @@ document.getElementById('r-evaluator-prof').textContent =
     document.getElementById('r-age').textContent = data.age + ' anos';
     document.getElementById('r-height').textContent = data.height + ' cm';
     document.getElementById('r-weight').textContent = data.weight + ' kg';
+    document.getElementById('result-date').textContent =
+    data.evaluationDate || '—';
+
     document.getElementById('r-equation').textContent = data.equation;
     document.getElementById('r-evaluator').textContent =
   data.evaluatorName || '—';
@@ -1284,7 +1295,9 @@ document.getElementById('results').classList.add('active');
   bfCol: bfCol,
   interp: interp.join(' '),
   evaluatorName: appData.evaluatorName,
-  evaluatorProf: appData.evaluatorProf
+  evaluatorProf: appData.evaluatorProf,
+  evaluationDate: evaluationDate
+
 };
     
     const encoded = encodeData(shareData);

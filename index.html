@@ -605,13 +605,20 @@ body {
 </p>
       </div>
 
-  <div class="evaluator-box">
-  <label for="evaluator-name">Nome do avaliador</label>
-  <input type="text" id="evaluator-name" placeholder="Ex: Felipe Lisboa">
+<div class="about">
+  <p><strong>Identificação do Avaliador</strong></p>
 
-  <label for="evaluator-prof">Profissão</label>
-  <input type="text" id="evaluator-prof" placeholder="Ex: Educação Física / Nutrição">
+  <div class="input-group">
+    <label for="evaluator-name">Nome do avaliador</label>
+    <input type="text" id="evaluator-name" placeholder="Ex: Felipe Lisboa">
+  </div>
+
+  <div class="input-group">
+    <label for="evaluator-prof">Profissão</label>
+    <input type="text" id="evaluator-prof" placeholder="Ex: Educação Física / Nutrição">
+  </div>
 </div>
+
       
       <button class="btn" id="btn-start">Iniciar Avaliação</button>
     </div>
@@ -1257,26 +1264,25 @@ document.getElementById('results').classList.add('active');
     else interp.push('Seu percentual de gordura corporal está moderadamente elevado.');
     
     const shareData = {
-      name: appData.name,
-      sex: appData.sex,
-      age: appData.age,
-      height: appData.height,
-      weight: appData.weight,
-      equation: appData.eq,
-      folds: results.folds,
-      bmi: results.bmi,
-      bf: results.bf,
-      fm: results.fm,
-      ffm: results.ffm,
-      bmiC: results.bmiC,
-      bfC: results.bfC,
-      bmiCol: bmiCol,
-      bfCol: bfCol,
-      interp: interp.join(' ')
-      evaluatorName: appData.evaluatorName,
-      evaluatorProf: appData.evaluatorProf,
-
-    };
+  name: appData.name,
+  sex: appData.sex,
+  age: appData.age,
+  height: appData.height,
+  weight: appData.weight,
+  equation: appData.eq,
+  folds: results.folds,
+  bmi: results.bmi,
+  bf: results.bf,
+  fm: results.fm,
+  ffm: results.ffm,
+  bmiC: results.bmiC,
+  bfC: results.bfC,
+  bmiCol: bmiCol,
+  bfCol: bfCol,
+  interp: interp.join(' '),
+  evaluatorName: appData.evaluatorName,
+  evaluatorProf: appData.evaluatorProf
+};
     
     const encoded = encodeData(shareData);
     const shareLink = 'https://feeducauel2019-svg.github.io/BodyCheck1/?data=' + encoded;
@@ -1343,6 +1349,11 @@ document.getElementById('results').classList.add('active');
     });
   });
 })();
+
+  document.getElementById('btn-start').addEventListener('click', () => {
+  goToScreen('info');
+});
+
 </script>
 </body>
 </html>

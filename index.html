@@ -604,6 +604,10 @@ body {
 
 </p>
       </div>
+      
+<button class="btn btn-secondary" id="btn-open-legal">
+  Aviso Legal & Política de Privacidade
+</button>
 
 <div class="about">
   <p><strong>Identificação do Avaliador</strong></p>
@@ -1370,6 +1374,10 @@ document.getElementById('results').classList.add('active');
  const today = new Date();
 evaluationDate = today.toLocaleDateString('pt-BR');
 goToScreen('info');
+    
+document.getElementById('btn-open-legal')?.addEventListener('click', () => {
+goToScreen('legal');
+});
 
 });
 

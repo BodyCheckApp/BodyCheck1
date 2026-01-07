@@ -604,6 +604,14 @@ body {
 
 </p>
       </div>
+
+  <div class="evaluator-box">
+  <label for="evaluator-name">Nome do avaliador</label>
+  <input type="text" id="evaluator-name" placeholder="Ex: Felipe Lisboa">
+
+  <label for="evaluator-prof">Profissão</label>
+  <input type="text" id="evaluator-prof" placeholder="Ex: Educação Física / Nutrição">
+</div>
       
       <button class="btn" id="btn-start">Iniciar Avaliação</button>
     </div>
@@ -661,7 +669,21 @@ body {
 
     <div id="results" class="screen">
       <h2 class="section-title">Resultados da Avaliação</h2>
-      
+
+      <div class="result-card">
+  <h3>Identificação do Avaliador</h3>
+
+  <div class="result-item">
+    <span class="result-label">Avaliador</span>
+    <span class="result-value" id="r-evaluator">--</span>
+  </div>
+
+  <div class="result-item">
+    <span class="result-label">Profissão</span>
+    <span class="result-value" id="r-evaluator-prof">--</span>
+  </div>
+</div>
+
       <div class="result-card">
         <h3>Informações do Paciente</h3>
         <div class="result-item">
@@ -776,7 +798,18 @@ body {
 (function() {
   'use strict';
   
-  let appData = {name: '', sex: '', age: 0, height: 0, weight: 0, eq: '', foldIds: []};
+  let appData = {
+  name: '',
+  sex: '',
+  age: 0,
+  height: 0,
+  weight: 0,
+  eq: '',
+  foldIds: [],
+  evaluatorName: '',
+  evaluatorProf: ''
+};
+
   let results = {};
   let currentFolds = {};
   
@@ -813,6 +846,12 @@ function validateInfo() {
   appData.age = age;
   appData.height = height;
   appData.weight = weight;
+  appData.evaluatorName =
+  document.getElementById('evaluator-name')?.value.trim() || '';
+
+appData.evaluatorProf =
+  document.getElementById('evaluator-prof')?.value.trim() || '';
+
   return true;
 }
 
@@ -979,7 +1018,13 @@ function calculate() {
     
     results.bmiC = bmiC;
     results.bfC = bfC;
-    
+
+  document.getElementById('r-evaluator').textContent =
+  appData.evaluatorName || '—';
+
+document.getElementById('r-evaluator-prof').textContent =
+  appData.evaluatorProf || '—';
+
     document.getElementById('r-name').textContent = appData.name;
     document.getElementById('r-sex').textContent = sex === 'm' ? 'Masculino' : 'Feminino';
     document.getElementById('r-age').textContent = age + ' anos';
@@ -1098,7 +1143,12 @@ function calculate() {
     document.getElementById('r-height').textContent = data.height + ' cm';
     document.getElementById('r-weight').textContent = data.weight + ' kg';
     document.getElementById('r-equation').textContent = data.equation;
-    
+    document.getElementById('r-evaluator').textContent =
+  data.evaluatorName || '—';
+
+document.getElementById('r-evaluator-prof').textContent =
+  data.evaluatorProf || '—';
+
     // Preencher dobras
     const fNames = {triceps: 'Tríceps', biceps: 'Bíceps', subscapular: 'Subescapular', suprailiac: 'Suprailíaca', chest: 'Peitoral', abdominal: 'Abdominal', thigh: 'Coxa'};
     const fc = document.getElementById('r-folds-container');
@@ -1223,6 +1273,9 @@ document.getElementById('results').classList.add('active');
       bmiCol: bmiCol,
       bfCol: bfCol,
       interp: interp.join(' ')
+      evaluatorName: appData.evaluatorName,
+      evaluatorProf: appData.evaluatorProf,
+
     };
     
     const encoded = encodeData(shareData);

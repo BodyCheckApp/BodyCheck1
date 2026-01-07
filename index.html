@@ -842,6 +842,8 @@ let evaluationDate = '';
     document.getElementById(id).classList.add('active');
     window.scrollTo(0, 0);
   }
+  window.goToScreen = goToScreen;
+
   
   function selectSex(el, val) {
     document.querySelectorAll('.radio-option').forEach(o => o.classList.remove('selected'));

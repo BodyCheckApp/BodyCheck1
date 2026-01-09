@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>BodyCheck</title>
@@ -1414,5 +1417,28 @@ goToScreen('legal');
 });
 
 </script>
+
+  <!-- Botão para salvar resultados em PDF -->
+<button class="btn btn-secondary" id="btn-save-pdf">Salvar Resultados em PDF</button>
+
+<script>
+document.getElementById('btn-save-pdf').addEventListener('click', async () => {
+  const resultsElement = document.getElementById('results'); // área que será capturada
+  // Captura a tela como imagem usando html2canvas
+  const canvas = await html2canvas(resultsElement, { scale: 2 });
+  const imgData = canvas.toDataURL('image/png');
+
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF('p', 'mm', 'a4');
+
+  // Ajusta a largura da imagem no PDF
+  const pdfWidth = pdf.internal.pageSize.getWidth();
+  const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+  pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+  pdf.save('BodyCheck_Resultados.pdf');
+});
+</script>
+
 </body>
 </html>

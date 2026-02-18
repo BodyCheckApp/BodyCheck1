@@ -338,12 +338,9 @@ var LZString={compressToEncodedURIComponent:function(r){return r?btoa(unescape(e
     })();
 // PASSO 2: Função para exibir a tela quando o aluno abre o link
 function displaySharedCharts(dataArray) {
-    // 1. Descompacta os dados recebidos da URL
     const name = dataArray[0];
-    const sex = dataArray[1];
     const rawHistory = dataArray[2];
 
-    // 2. Reconstrói o histórico no formato de objeto
     const historyData = rawHistory.map(h => ({
         date: h[0],
         weight: h[1],
@@ -352,44 +349,26 @@ function displaySharedCharts(dataArray) {
         ffm: h[4]
     }));
 
-    // 3. Prepara a tela (Esconde tudo e ativa a de perfil temporariamente como base)
+    // Esconde todas as telas e ativa a de gráficos
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById('student-charts').classList.add('active');
 
-    // 4. Ajusta os textos da tela
     const title = document.getElementById('charts-title');
-    if(title) title.textContent = name;
-    
-    // 5. Esconde botões que o aluno não deve ver (Gerar Link, Voltar ao Perfil)
-    // Mantém o botão de Salvar como PDF visível
-    const chartScreen = document.getElementById('student-charts');
-    const btnShare = document.getElementById('btn-share-charts');
-    if (btnShare) btnShare.style.display = 'none';
-    // Esconde o botão "Voltar ao Perfil" (seleciona pelo onclick)
-    chartScreen.querySelectorAll('button').forEach(btn => {
-        if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes('student-profile')) {
-            btn.style.display = 'none';
-        }
+    if (title) title.textContent = 'Evolução - ' + name;
+
+    // Esconde botões que o aluno não deve ver, mantém PDF
+    document.getElementById('btn-share-charts').style.display = 'none';
+    document.querySelectorAll('#student-charts button').forEach(btn => {
+        const oc = btn.getAttribute('onclick') || '';
+        if (oc.includes('student-profile')) btn.style.display = 'none';
     });
 
-    // 6. Desenha os gráficos
-    // Importante: Limpa o container antes
+    // Renderiza os gráficos usando createLineChart (mesma função do app)
     const container = document.getElementById('charts-container');
-    container.innerHTML = `
-        <div class="chart-card"><h4>Peso (kg)</h4><div id="shared-chart-weight"></div></div>
-        <div class="chart-card"><h4>Gordura (%)</h4><div id="shared-chart-bf"></div></div>
-        <div class="chart-card"><h4>Massa Magra (kg)</h4><div id="shared-chart-ffm"></div></div>
-    `;
-
-    // Pequeno delay para garantir que o HTML renderizou antes de desenhar o SVG
-    setTimeout(() => {
-        // Chama sua função existente de desenhar gráficos (assumindo que drawChart existe)
-        if (typeof drawChart === 'function') {
-            drawChart(historyData, 'weight', 'shared-chart-weight', '#0b2e5f', 'kg');
-            drawChart(historyData, 'bf', 'shared-chart-bf', '#ef4444', '%');
-            drawChart(historyData, 'ffm', 'shared-chart-ffm', '#10b981', 'kg');
-        }
-    }, 100);
+    container.innerHTML = '';
+    container.innerHTML += createLineChart('Massa Corporal (kg)', historyData, 'weight', '#0b2e5f');
+    container.innerHTML += createLineChart('Massa Gorda (%)', historyData, 'bf', '#ef4444');
+    container.innerHTML += createLineChart('Massa Livre de Gordura (%)', historyData, 'ffm', '#0b2e5f');
 }
 
 </script>
@@ -667,12 +646,6 @@ function displaySharedCharts(dataArray) {
     }
     
     (function checkLegal() {
-        const params = new URLSearchParams(window.location.search);
-        const isSharedLink = params.get('c') || params.get('data');
-        if (isSharedLink) {
-            document.getElementById('legal').classList.remove('active');
-            return;
-        }
         if(localStorage.getItem('bodycheck_legal_accepted') === 'true') {
             document.getElementById('legal').classList.remove('active');
             document.getElementById('home').classList.add('active');
@@ -1724,47 +1697,38 @@ function displaySharedCharts(dataArray) {
         goToScreen('results');
       }
 
-      // Usando encodeData e decodeData globais
+      function checkSharedView() {
+        const urlParams = new URLSearchParams(window.location.search);
 
-  // PASSO 3: Verifica a URL ao abrir o aplicativo
-function checkSharedView() {
-    const urlParams = new URLSearchParams(window.location.search);
-
-    // 1. Verifica se é um link de GRÁFICOS (?c=...)
-    const chartsData = urlParams.get('c');
-    if (chartsData) {
-        try {
+        // Link de gráficos (?c=)
+        const chartsData = urlParams.get('c');
+        if (chartsData) {
+          try {
             const jsonStr = LZString.decompressFromEncodedURIComponent(chartsData);
             if (jsonStr) {
-                const data = JSON.parse(jsonStr);
-                if (Array.isArray(data) && data.length >= 3) {
-                    document.getElementById('legal').classList.remove('active');
-                    displaySharedCharts(data);
-                    return true;
-                }
-            }
-        } catch (e) {
-            console.error('Erro ao processar link de gráficos:', e);
-        }
-    }
-
-    // 2. Verifica se é um link de RESULTADO SIMPLES (?data=...)
-    const resultData = urlParams.get('data');
-    if (resultData) {
-        try {
-            const data = window.decodeData(resultData);
-            if (data) {
-                document.getElementById('legal').classList.remove('active');
-                displaySharedResults(data);
+              const data = JSON.parse(jsonStr);
+              if (Array.isArray(data) && data.length >= 3) {
+                displaySharedCharts(data);
                 return true;
+              }
             }
-        } catch (e) {
-            console.error('Erro ao processar link de resultado:', e);
+          } catch (e) {
+            console.error('Erro ao processar link de gráficos:', e);
+          }
         }
-    }
 
-    return false;
-}
+        // Link de resultado (?data=)
+        const sharedData = urlParams.get('data');
+        if (sharedData) {
+          const data = decodeData(sharedData);
+          if (data) {
+            displaySharedResults(data);
+            return true;
+          }
+        }
+
+        return false;
+      }
 
       function displaySharedResults(data) {
         document.getElementById('home').style.display = 'none';
@@ -1797,13 +1761,9 @@ function checkSharedView() {
         }
 
         document.getElementById('r-bmi').textContent = data.bmi;
-        // Classificação IMC para formato compacto
-        let bmiC = 'Peso normal';
-        let bmiCol = 'normal';
-        if (data.bmiC && data.bmiCol) {
-          bmiC = data.bmiC;
-          bmiCol = data.bmiCol;
-        } else {
+        let bmiC = data.bmiC || 'Peso normal';
+        let bmiCol = data.bmiCol || 'normal';
+        if (!data.bmiC) {
           const bmi = parseFloat(data.bmi);
           if (bmi < 18.5) { bmiC = 'Baixo peso'; bmiCol = 'warning'; }
           else if (bmi < 25) { bmiC = 'Peso normal'; bmiCol = 'normal'; }
@@ -1832,7 +1792,7 @@ function checkSharedView() {
         const bodyCompositionCard = document.getElementById('r-bf').closest('.result-card');
         bodyCompositionCard.insertAdjacentHTML('afterend', chartHTML);
 
-        document.getElementById('r-interp').innerHTML = '<strong>Interpretação:</strong><br>' + (data.interp || 'Avaliação histórica.');
+        document.getElementById('r-interp').innerHTML = '<strong>Interpretação:</strong><br>' + (data.interp || '—');
 
         const citationText = citations[data.formulaKey] || data.equation;
         const bmiCitationText = bmiRefs[data.age >= 60 ? 'elder' : (data.age <= 17 ? 'child' : 'adult')] || 'WHO';
@@ -1841,26 +1801,28 @@ function checkSharedView() {
           <h3>Referências Científicas</h3>
           <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Protocolo de Gordura:</strong> ${citationText}</p></div>
           <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Classificação do IMC:</strong> ${bmiCitationText}</p></div></div>`;
-        
-        const disclaimerHTML = `<div class="disclaimer-box"><p><strong>Aviso Legal:</strong> Esta avaliação não substitui diagnóstico médico ou nutricional. Os resultados representam estimativas da composição corporal baseadas em equações de predição validadas cientificamente. Para orientação profissional individualizada, consulte um nutricionista ou médico especializado.</p></div>`;
+
+        const disclaimerHTML = `<div class="disclaimer-box"><p><strong>Aviso Legal:</strong> Esta avaliação não substitui diagnóstico médico ou nutricional.</p></div>`;
 
         const interpDiv = document.getElementById('r-interp');
         interpDiv.insertAdjacentHTML('afterend', referencesHTML);
         interpDiv.nextElementSibling.insertAdjacentHTML('afterend', disclaimerHTML);
 
-        // Esconder botões de ação para visualização compartilhada
         document.getElementById('btn-share-link').style.display = 'none';
         document.getElementById('btn-save-history').style.display = 'none';
-        // Manter apenas botão de Nova Avaliação (para voltar ao início)
-        document.getElementById('btn-new').textContent = 'Voltar ao Início';
-        document.getElementById('btn-new').onclick = () => {
-          window.location.href = window.location.href.split('?')[0];
-        };
+
+        const resultsDiv = document.getElementById('results');
+        const btnPdf = document.createElement('button');
+        btnPdf.className = 'btn';
+        btnPdf.style.background = '#0b2e5f';
+        btnPdf.innerHTML = 'Salvar como PDF';
+        btnPdf.onclick = () => window.print();
+        resultsDiv.appendChild(btnPdf);
 
         document.getElementById('results').classList.add('active');
       }
 
-      function generateShareLink() {
+            function generateShareLink() {
         let interp = document.getElementById('r-interp-text').value.trim();
         if (!interp) {
             interp = 'Interpretação não fornecida.';

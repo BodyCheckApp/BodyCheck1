@@ -1710,9 +1710,7 @@ var LZString={compressToEncodedURIComponent:function(r){return r?btoa(unescape(e
           evaluationDate: evaluationDate
         };
         const longLink = 'https://bodycheckapp.github.io/BodyCheck1/?data=' + encodeData(shareData);
-        fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longLink)}`)
-          .then(r => r.text()).then(s => { document.getElementById('share-link-input').value = s; })
-          .catch(() => { document.getElementById('share-link-input').value = longLink; });
+        document.getElementById('share-link-input').value = longLink;
         document.getElementById('share-modal').classList.add('show');
       }
 
@@ -1732,9 +1730,7 @@ var LZString={compressToEncodedURIComponent:function(r){return r?btoa(unescape(e
           evaluationDate: currentHistoryData.evaluationDate
         };
         const longLink = 'https://bodycheckapp.github.io/BodyCheck1/?data=' + encodeData(shareData);
-        fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longLink)}`)
-          .then(r => r.text()).then(s => { document.getElementById('share-link-input').value = s; })
-          .catch(() => { document.getElementById('share-link-input').value = longLink; });
+        document.getElementById('share-link-input').value = longLink;
         document.getElementById('share-modal').classList.add('show');
       }
       window.generateHistoryShareLink = generateHistoryShareLink;
@@ -1750,9 +1746,7 @@ var LZString={compressToEncodedURIComponent:function(r){return r?btoa(unescape(e
         });
         const compressed = LZString.compressToEncodedURIComponent(JSON.stringify([s.name, s.sex, historyArray]));
         const longLink = 'https://bodycheckapp.github.io/BodyCheck1/?c=' + compressed;
-        fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longLink)}`)
-          .then(r => r.text()).then(v => { document.getElementById('charts-share-link-input').value = v; })
-          .catch(() => { document.getElementById('charts-share-link-input').value = longLink; });
+        document.getElementById('charts-share-link-input').value = longLink;
         document.getElementById('charts-share-modal').classList.add('show');
       }
       window.generateChartsShareLink = generateChartsShareLink;

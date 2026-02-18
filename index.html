@@ -326,7 +326,7 @@
 <script>
 
 // LZString Library - Versão mínima
-var LZString={compressToEncodedURIComponent:function(r){return r?btoa(unescape(encodeURIComponent(r))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=/g,""):""},decompressFromEncodedURIComponent:function(r){if(!r)return"";r+="===";try{return decodeURIComponent(escape(atob(r.replace(/-/g,"+").replace(/_/g,"/"))))}catch(e){return""}}};
+var LZString={compressToEncodedURIComponent:function(r){return r?btoa(unescape(encodeURIComponent(r))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=/g,""):""},decompressFromEncodedURIComponent:function(r){if(!r)return"";var e=r.replace(/-/g,"+").replace(/_/g,"/");var p=e.length%4;if(p)e+="=".repeat(4-p);try{return decodeURIComponent(escape(atob(e)))}catch(e){return""}}};
 
     (function blockDesktopAccess() {
       const ua = navigator.userAgent.toLowerCase();
@@ -1560,16 +1560,25 @@ var LZString={compressToEncodedURIComponent:function(r){return r?btoa(unescape(e
         const urlParams = new URLSearchParams(window.location.search);
 
         // Link de gráficos (?c=)
+        // Compatível com links atuais (array comprimido) e com possível fallback (JSON direto)
         const chartsData = urlParams.get('c');
         if (chartsData) {
           try {
+            let parsedData = null;
+
             const jsonStr = LZString.decompressFromEncodedURIComponent(chartsData);
-            if (jsonStr) {
-              const data = JSON.parse(jsonStr);
-              if (Array.isArray(data) && data.length >= 3) {
-                displaySharedCharts(data);
-                return true;
+            if (jsonStr) parsedData = JSON.parse(jsonStr);
+
+            // Fallback: caso algum ambiente altere o payload e ele venha como JSON URI-encoded
+            if (!parsedData) {
+              const decodedChartsData = decodeURIComponent(chartsData);
+              if (decodedChartsData.startsWith('[') || decodedChartsData.startsWith('{')) {
+                parsedData = JSON.parse(decodedChartsData);
               }
+            }
+
+            if (parsedData && displaySharedCharts(parsedData)) {
+              return true;
             }
           } catch(e) {}
         }
@@ -1674,16 +1683,38 @@ var LZString={compressToEncodedURIComponent:function(r){return r?btoa(unescape(e
 
       // ── EXIBIR GRÁFICOS COMPARTILHADOS ──
       function displaySharedCharts(dataArray) {
-        const name       = dataArray[0];
-        const rawHistory = dataArray[2];
+        // Aceita tanto o formato array [name, sex, historyArray]
+        // quanto um objeto { name, history }
+        let name = '';
+        let rawHistory = [];
+
+        if (Array.isArray(dataArray)) {
+          name = dataArray[0] || 'Aluno';
+          rawHistory = Array.isArray(dataArray[2]) ? dataArray[2] : [];
+        } else if (dataArray && typeof dataArray === 'object') {
+          name = dataArray.name || 'Aluno';
+          rawHistory = Array.isArray(dataArray.history) ? dataArray.history : [];
+        }
+
+        if (!rawHistory.length) return false;
 
         // Mesmo formato que showStudentCharts usa internamente
         const historyData = rawHistory.map(h => ({
-          date:   h[0],
-          weight: parseFloat(h[1]),
-          bf:     parseFloat(h[2]),
-          ffm:    parseFloat((100 - parseFloat(h[2])).toFixed(1))
-        }));
+          date:   Array.isArray(h) ? h[0] : h.date,
+          weight: parseFloat(Array.isArray(h) ? h[1] : h.weight),
+          bf:     parseFloat(Array.isArray(h) ? h[2] : h.bf),
+          ffm:    parseFloat((100 - parseFloat(Array.isArray(h) ? h[2] : h.bf)).toFixed(1))
+        })).filter(item => item.date && !isNaN(item.weight) && !isNaN(item.bf));
+
+        if (historyData.length < 2) return false;
+
+        // Garante que somente a tela de evolução fique visível no modo compartilhado
+        document.querySelectorAll('.screen').forEach(screen => {
+          screen.style.display = 'none';
+          screen.classList.remove('active');
+        });
+        document.getElementById('student-charts').style.display = 'block';
+        document.getElementById('student-charts').classList.add('active');
 
         document.getElementById('charts-title').innerText = 'Evolução - ' + name;
 
@@ -1701,6 +1732,7 @@ var LZString={compressToEncodedURIComponent:function(r){return r?btoa(unescape(e
         });
 
         goToScreen('student-charts');
+        return true;
       }
 
       // ── GERAR LINK — RESULTADOS (avaliação nova) ──

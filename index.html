@@ -1716,7 +1716,7 @@ var LZString={compressToEncodedURIComponent:function(r){return r?btoa(unescape(e
           evaluatorName: appData.evaluatorName, evaluatorProf: appData.evaluatorProf,
           evaluationDate: evaluationDate
         };
-        const longLink = 'https://bodycheckapp.github.io/BodyCheck1/?data=' + encodeData(shareData);
+        const longLink = 'https://bodycheckapp.github.io/BodyCheck1/index.html?data=' + encodeData(shareData);
         document.getElementById('share-link-input').value = longLink;
         document.getElementById('share-modal').classList.add('show');
       }
@@ -1736,7 +1736,7 @@ var LZString={compressToEncodedURIComponent:function(r){return r?btoa(unescape(e
           evaluatorProf: localStorage.getItem('bodycheck_eval_prof') || '',
           evaluationDate: currentHistoryData.evaluationDate
         };
-        const longLink = 'https://bodycheckapp.github.io/BodyCheck1/?data=' + encodeData(shareData);
+        const longLink = 'https://bodycheckapp.github.io/BodyCheck1/index.html?data=' + encodeData(shareData);
         document.getElementById('share-link-input').value = longLink;
         document.getElementById('share-modal').classList.add('show');
       }
@@ -1752,7 +1752,7 @@ var LZString={compressToEncodedURIComponent:function(r){return r?btoa(unescape(e
           return [h.date, parseFloat(h.weight), parseFloat(h.bf), fm, ffm];
         });
         const compressed = LZString.compressToEncodedURIComponent(JSON.stringify([s.name, s.sex, historyArray]));
-        const longLink = 'https://bodycheckapp.github.io/BodyCheck1/?c=' + compressed;
+        const longLink = 'https://bodycheckapp.github.io/BodyCheck1/index.html?c=' + compressed;
         document.getElementById('charts-share-link-input').value = longLink;
         document.getElementById('charts-share-modal').classList.add('show');
       }

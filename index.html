@@ -336,41 +336,6 @@ var LZString={compressToEncodedURIComponent:function(r){return r?btoa(unescape(e
         document.body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:Arial,sans-serif;text-align:center;padding:20px;background:#f7f7f7;color:#333;"><div><h2>Aplicação exclusiva para dispositivos móveis</h2><p>Este sistema foi desenvolvido para uso apenas no aplicativo oficial.</p></div></div>`;
       }
     })();
-// PASSO 2: Função para exibir a tela quando o aluno abre o link
-function displaySharedCharts(dataArray) {
-    const name = dataArray[0];
-    const rawHistory = dataArray[2];
-
-    const historyData = rawHistory.map(h => ({
-        date: h[0],
-        weight: h[1],
-        bf: h[2],
-        fm: h[3],
-        ffm: h[4]
-    }));
-
-    // Esconde todas as telas e ativa a de gráficos
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById('student-charts').classList.add('active');
-
-    const title = document.getElementById('charts-title');
-    if (title) title.textContent = 'Evolução - ' + name;
-
-    // Esconde botões que o aluno não deve ver, mantém PDF
-    document.getElementById('btn-share-charts').style.display = 'none';
-    document.querySelectorAll('#student-charts button').forEach(btn => {
-        const oc = btn.getAttribute('onclick') || '';
-        if (oc.includes('student-profile')) btn.style.display = 'none';
-    });
-
-    // Renderiza os gráficos usando createLineChart (mesma função do app)
-    const container = document.getElementById('charts-container');
-    container.innerHTML = '';
-    container.innerHTML += createLineChart('Massa Corporal (kg)', historyData, 'weight', '#0b2e5f');
-    container.innerHTML += createLineChart('Massa Gorda (%)', historyData, 'bf', '#ef4444');
-    container.innerHTML += createLineChart('Massa Livre de Gordura (%)', historyData, 'ffm', '#0b2e5f');
-}
-
 </script>
 
 <div class="app">
@@ -694,21 +659,6 @@ function displaySharedCharts(dataArray) {
     };
     window.fieldNames = fieldNames;
 
-    // Funções de encode/decode globais para compartilhamento
-    function encodeData(data) {
-        return btoa(unescape(encodeURIComponent(JSON.stringify(data))));
-    }
-    window.encodeData = encodeData;
-
-    function decodeData(encoded) {
-        try {
-            return JSON.parse(decodeURIComponent(escape(atob(encoded))));
-        } catch (e) {
-            return null;
-        }
-    }
-    window.decodeData = decodeData;
-
     function saveDB() {
         localStorage.setItem('bodycheck_students', JSON.stringify(studentsDB));
     }
@@ -932,48 +882,6 @@ function displaySharedCharts(dataArray) {
     }
     
     // Gerar link de compartilhamento para avaliação do histórico
-    function generateHistoryShareLink() {
-        if (!currentHistoryData) {
-            showToast('Erro: dados do histórico não encontrados', 'error');
-            return;
-        }
-        
-        const shareData = {
-            name: currentHistoryData.name,
-            sex: currentHistoryData.sex,
-            age: currentHistoryData.age,
-            height: currentHistoryData.height,
-            weight: currentHistoryData.weight,
-            equation: currentHistoryData.equation,
-            formulaKey: currentHistoryData.formulaKey || '',
-            folds: currentHistoryData.folds,
-            bmi: currentHistoryData.bmi,
-            bf: currentHistoryData.bf,
-            fm: currentHistoryData.fm,
-            ffm: currentHistoryData.ffm,
-            bmiC: currentHistoryData.bmiC,
-            bmiCol: currentHistoryData.bmiCol,
-            interp: 'Avaliação histórica do aluno.',
-            evaluatorName: localStorage.getItem('bodycheck_eval_name') || '',
-            evaluatorProf: localStorage.getItem('bodycheck_eval_prof') || '',
-            evaluationDate: currentHistoryData.evaluationDate
-        };
-
-        const encoded = window.encodeData(shareData);
-        const longLink = 'https://bodycheckapp.github.io/BodyCheck1/?data=' + encoded;
-
-        fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longLink)}`)
-          .then(response => response.text())
-          .then(shortLink => {
-            document.getElementById('share-link-input').value = shortLink;
-          })
-          .catch(err => {
-            document.getElementById('share-link-input').value = longLink;
-          });
-
-        document.getElementById('share-modal').classList.add('show');
-    }
-    window.generateHistoryShareLink = generateHistoryShareLink;
 
     function startStudentEval() {
         const s = studentsDB.find(st => st.id === currentStudentId);
@@ -1123,64 +1031,6 @@ function displaySharedCharts(dataArray) {
 
     // === FUNÇÕES DE GRÁFICOS ===
     
-    function generateChartsShareLink() {
-        const s = studentsDB.find(st => st.id === currentStudentId);
-        if (!s || s.history.length === 0) {
-            showToast('Não há histórico para compartilhar.', 'error');
-            return;
-        }
-        
-        // Formato do array: [nome, sexo, historico]
-        // O histórico é um array de arrays: [data, peso, bf, fm, ffm]
-        const historyArray = s.history.map(h => {
-            const fm = h.fm ? parseFloat(h.fm) : parseFloat(((h.bf / 100) * h.weight).toFixed(1));
-            const ffm = h.ffm ? parseFloat(h.ffm) : parseFloat((h.weight - ((h.bf / 100) * h.weight)).toFixed(1));
-            return [
-                h.date,
-                parseFloat(h.weight),
-                parseFloat(h.bf),
-                fm,
-                ffm
-            ];
-        });
-        
-        const shareData = [
-            s.name,
-            s.sex,
-            historyArray
-        ];
-        
-        // Usa LZString para comprimir os dados (compatível com o código de leitura)
-        const compressed = LZString.compressToEncodedURIComponent(JSON.stringify(shareData));
-        const longLink = 'https://bodycheckapp.github.io/BodyCheck1/?c=' + compressed;
-        
-        fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longLink)}`)
-            .then(response => response.text())
-            .then(shortLink => {
-                document.getElementById('charts-share-link-input').value = shortLink;
-            })
-            .catch(err => {
-                document.getElementById('charts-share-link-input').value = longLink;
-            });
-        
-        document.getElementById('charts-share-modal').classList.add('show');
-    }
-    window.generateChartsShareLink = generateChartsShareLink;
-    
-    function copyChartsShareLink() {
-        const input = document.getElementById('charts-share-link-input');
-        input.select();
-        input.setSelectionRange(0, 99999);
-        try {
-            document.execCommand('copy');
-            showToast('Link copiado!', 'success');
-        } catch (err) {
-            navigator.clipboard.writeText(input.value).then(() => {
-                showToast('Link copiado!', 'success');
-            }).catch(() => {});
-        }
-    }
-    window.copyChartsShareLink = copyChartsShareLink;
     
     function showStudentCharts() {
         const s = studentsDB.find(st => st.id === currentStudentId);
@@ -1697,10 +1547,20 @@ function displaySharedCharts(dataArray) {
         goToScreen('results');
       }
 
+      // ── ENCODE / DECODE ──
+      function encodeData(data) {
+        return btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+      }
+      function decodeData(encoded) {
+        try { return JSON.parse(decodeURIComponent(escape(atob(encoded)))); }
+        catch(e) { return null; }
+      }
+
+      // ── LER URL E EXIBIR CONTEÚDO COMPARTILHADO ──
       function checkSharedView() {
         const urlParams = new URLSearchParams(window.location.search);
 
-        // Link de gráficos (?c=)
+        // ?c= → gráficos de evolução
         const chartsData = urlParams.get('c');
         if (chartsData) {
           try {
@@ -1712,210 +1572,237 @@ function displaySharedCharts(dataArray) {
                 return true;
               }
             }
-          } catch (e) {
-            console.error('Erro ao processar link de gráficos:', e);
-          }
+          } catch(e) {}
         }
 
-        // Link de resultado (?data=)
+        // ?data= → resultado de avaliação
         const sharedData = urlParams.get('data');
         if (sharedData) {
           const data = decodeData(sharedData);
-          if (data) {
-            displaySharedResults(data);
-            return true;
-          }
+          if (data) { displaySharedResults(data); return true; }
         }
 
         return false;
       }
 
+      // ── EXIBIR RESULTADOS COMPARTILHADOS ──
       function displaySharedResults(data) {
-        document.getElementById('home').style.display = 'none';
-        document.getElementById('info').style.display = 'none';
-        document.getElementById('folds').style.display = 'none';
-
-        document.getElementById('r-name').textContent = data.name;
-        document.getElementById('r-sex').textContent = data.sex === 'm' ? 'Masculino' : 'Feminino';
-        document.getElementById('r-age').textContent = (data.age || '--') + ' anos';
-        document.getElementById('r-height').textContent = (data.height || '--') + ' cm';
-        document.getElementById('r-weight').textContent = data.weight + ' kg';
-        document.getElementById('result-date').textContent = data.evaluationDate || '—';
-        document.getElementById('r-equation').textContent = data.equation || '—';
-        document.getElementById('r-evaluator').textContent = data.evaluatorName || '—';
+        document.getElementById('r-evaluator').textContent      = data.evaluatorName || '—';
         document.getElementById('r-evaluator-prof').textContent = data.evaluatorProf || '—';
+        document.getElementById('r-name').textContent           = data.name;
+        document.getElementById('r-sex').textContent            = data.sex === 'm' ? 'Masculino' : 'Feminino';
+        document.getElementById('r-age').textContent            = (data.age || '--') + ' anos';
+        document.getElementById('r-height').textContent         = (data.height || '--') + ' cm';
+        document.getElementById('r-weight').textContent         = data.weight + ' kg';
+        document.getElementById('result-date').textContent      = data.evaluationDate || '—';
+        document.getElementById('r-equation').textContent       = data.equation || '—';
+        document.getElementById('r-bmi').textContent            = data.bmi;
+        document.getElementById('r-bmi-class').innerHTML        = `<span class="classification ${data.bmiCol}">${data.bmiC}</span>`;
+        document.getElementById('r-bf').textContent             = data.bf + '%';
+        document.getElementById('r-fm').textContent             = data.fm + ' kg';
+        document.getElementById('r-ffm').textContent            = data.ffm + ' kg';
 
+        // Dobras coletadas
         const fc = document.getElementById('r-folds-container');
         fc.innerHTML = '';
         if (data.folds) {
           for (let k in data.folds) {
-            if(fieldNames[k]) {
-               const d = document.createElement('div');
-               d.className = 'result-item';
-               const unit = fieldNames[k].n.includes('cm') ? 'cm' : 'mm';
-               const label = fieldNames[k].n.split('(')[0];
-               d.innerHTML = `<span class="result-label">${label}</span><span class="result-value">${data.folds[k]} ${unit}</span>`;
-               fc.appendChild(d);
+            if (fieldNames[k]) {
+              const unit  = fieldNames[k].n.includes('cm') ? 'cm' : 'mm';
+              const label = fieldNames[k].n.split('(')[0];
+              const d = document.createElement('div');
+              d.className = 'result-item';
+              d.innerHTML = `<span class="result-label">${label}</span><span class="result-value">${data.folds[k]} ${unit}</span>`;
+              fc.appendChild(d);
             }
           }
         }
 
-        document.getElementById('r-bmi').textContent = data.bmi;
-        let bmiC = data.bmiC || 'Peso normal';
-        let bmiCol = data.bmiCol || 'normal';
-        if (!data.bmiC) {
-          const bmi = parseFloat(data.bmi);
-          if (bmi < 18.5) { bmiC = 'Baixo peso'; bmiCol = 'warning'; }
-          else if (bmi < 25) { bmiC = 'Peso normal'; bmiCol = 'normal'; }
-          else if (bmi < 30) { bmiC = 'Sobrepeso'; bmiCol = 'attention'; }
-          else { bmiC = 'Obesidade'; bmiCol = 'warning'; }
-        }
-        document.getElementById('r-bmi-class').innerHTML = `<span class="classification ${bmiCol}">${bmiC}</span>`;
+        // Gráfico de composição corporal
+        const bfPct  = parseFloat(data.bf);
+        const ffmPct = (100 - bfPct).toFixed(1);
+        document.getElementById('r-bf').closest('.result-card').insertAdjacentHTML('afterend', `
+          <div class="composition-chart">
+            <h3 style="color:#1e4fa3;margin-bottom:1rem;font-size:1.15rem;">Gráfico de Composição Corporal</h3>
+            <div class="chart-single-bar">
+              <div class="chart-segment fat" style="width:${bfPct}%">${data.bf}%</div>
+              <div class="chart-segment ffm" style="width:${ffmPct}%">${ffmPct}%</div>
+            </div>
+            <div class="chart-legend">
+              <div class="legend-item"><div class="legend-color fat"></div><span class="legend-text">Massa Gorda: ${data.bf}% (${data.fm} kg)</span></div>
+              <div class="legend-item"><div class="legend-color ffm"></div><span class="legend-text">Massa Livre de Gordura: ${ffmPct}% (${data.ffm} kg)</span></div>
+            </div>
+          </div>`);
 
-        document.getElementById('r-bf').textContent = data.bf + '%';
-        document.getElementById('r-fm').textContent = data.fm + ' kg';
-        document.getElementById('r-ffm').textContent = data.ffm + ' kg';
+        // Interpretação (modo leitura)
+        const interpEl = document.getElementById('r-interp');
+        interpEl.innerHTML = '<strong>Interpretação:</strong><br>' + (data.interp || '—');
+        interpEl.style.display = 'block';
+        // Ocultar textarea de interpretação (é para o avaliador editar)
+        const interpGroup = document.getElementById('r-interp-text');
+        if (interpGroup) interpGroup.closest('.input-group').style.display = 'none';
 
-        const bfPercent = parseFloat(data.bf);
-        const ffmPercent = (100 - bfPercent).toFixed(1);
-
-        const chartHTML = `<div class="composition-chart">
-          <h3 style="color: #1e4fa3; margin-bottom: 1rem; font-size: 1.15rem;">Gráfico de Composição Corporal</h3>
-          <div class="chart-single-bar">
-            <div class="chart-segment fat" style="width: ${bfPercent}%">${data.bf}%</div>
-            <div class="chart-segment ffm" style="width: ${ffmPercent}%">${ffmPercent}%</div>
+        // Referências científicas
+        const citationText    = (citations && citations[data.formulaKey]) || data.equation || '—';
+        const bmiCitationText = (bmiRefs && bmiRefs[data.age >= 60 ? 'elder' : (data.age <= 17 ? 'child' : 'adult')]) || 'WHO';
+        interpEl.insertAdjacentHTML('afterend', `
+          <div class="references-section">
+            <h3>Referências Científicas</h3>
+            <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Protocolo de Gordura:</strong> ${citationText}</p></div>
+            <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Classificação do IMC:</strong> ${bmiCitationText}</p></div>
           </div>
-          <div class="chart-legend">
-            <div class="legend-item"><div class="legend-color fat"></div><span class="legend-text">Massa Gorda: ${data.bf}% (${data.fm} kg)</span></div>
-            <div class="legend-item"><div class="legend-color ffm"></div><span class="legend-text">Massa Livre de Gordura: ${ffmPercent}% (${data.ffm} kg)</span></div>
-          </div></div>`;
-        const bodyCompositionCard = document.getElementById('r-bf').closest('.result-card');
-        bodyCompositionCard.insertAdjacentHTML('afterend', chartHTML);
+          <div class="disclaimer-box"><p><strong>Aviso Legal:</strong> Esta avaliação não substitui diagnóstico médico ou nutricional. Os resultados representam estimativas baseadas em equações de predição validadas cientificamente.</p></div>`);
 
-        document.getElementById('r-interp').innerHTML = '<strong>Interpretação:</strong><br>' + (data.interp || '—');
-
-        const citationText = citations[data.formulaKey] || data.equation;
-        const bmiCitationText = bmiRefs[data.age >= 60 ? 'elder' : (data.age <= 17 ? 'child' : 'adult')] || 'WHO';
-
-        const referencesHTML = `<div class="references-section">
-          <h3>Referências Científicas</h3>
-          <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Protocolo de Gordura:</strong> ${citationText}</p></div>
-          <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Classificação do IMC:</strong> ${bmiCitationText}</p></div></div>`;
-
-        const disclaimerHTML = `<div class="disclaimer-box"><p><strong>Aviso Legal:</strong> Esta avaliação não substitui diagnóstico médico ou nutricional.</p></div>`;
-
-        const interpDiv = document.getElementById('r-interp');
-        interpDiv.insertAdjacentHTML('afterend', referencesHTML);
-        interpDiv.nextElementSibling.insertAdjacentHTML('afterend', disclaimerHTML);
-
-        document.getElementById('btn-share-link').style.display = 'none';
+        // Esconder botões do avaliador; manter apenas "Salvar como PDF"
+        document.getElementById('btn-share-link').style.display   = 'none';
         document.getElementById('btn-save-history').style.display = 'none';
+        document.getElementById('btn-new').style.display          = 'none';
 
-        const resultsDiv = document.getElementById('results');
-        const btnPdf = document.createElement('button');
-        btnPdf.className = 'btn';
-        btnPdf.style.background = '#0b2e5f';
-        btnPdf.innerHTML = 'Salvar como PDF';
-        btnPdf.onclick = () => window.print();
-        resultsDiv.appendChild(btnPdf);
-
+        // Ativar a tela de resultados
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById('results').classList.add('active');
       }
 
-            function generateShareLink() {
-        let interp = document.getElementById('r-interp-text').value.trim();
-        if (!interp) {
-            interp = 'Interpretação não fornecida.';
-        }
+      // ── EXIBIR GRÁFICOS COMPARTILHADOS ──
+      function displaySharedCharts(dataArray) {
+        const name       = dataArray[0];
+        const rawHistory = dataArray[2];
 
+        // Mesmo formato que showStudentCharts usa internamente
+        const historyData = rawHistory.map(h => ({
+          date:   h[0],
+          weight: parseFloat(h[1]),
+          bf:     parseFloat(h[2]),
+          ffm:    parseFloat((100 - parseFloat(h[2])).toFixed(1))
+        }));
+
+        document.getElementById('charts-title').innerText = 'Evolução - ' + name;
+
+        const container = document.getElementById('charts-container');
+        container.innerHTML = '';
+        container.innerHTML += createLineChart('Massa Corporal (kg)',        historyData, 'weight', '#0b2e5f');
+        container.innerHTML += createLineChart('Massa Gorda (%)',             historyData, 'bf',     '#ef4444');
+        container.innerHTML += createLineChart('Massa Livre de Gordura (%)', historyData, 'ffm',    '#0b2e5f');
+
+        // Esconder botões do avaliador; manter PDF
+        document.getElementById('btn-share-charts').style.display = 'none';
+        document.querySelectorAll('#student-charts button').forEach(btn => {
+          if ((btn.getAttribute('onclick') || '').includes('student-profile'))
+            btn.style.display = 'none';
+        });
+
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('student-charts').classList.add('active');
+      }
+
+      // ── GERAR LINK — RESULTADOS (avaliação nova) ──
+      function generateShareLink() {
+        const interp = (document.getElementById('r-interp-text').value.trim()) || 'Interpretação não fornecida.';
         const shareData = {
-          name: appData.name,
-          sex: appData.sex,
-          age: appData.age,
-          height: appData.height,
-          weight: appData.weight,
-          equation: appData.eq,
-          formulaKey: appData.formulaKey,
-          folds: results.folds,
-          bmi: results.bmi,
-          bf: results.bf,
-          fm: results.fm,
-          ffm: results.ffm,
-          bmiC: results.bmiC,
-          bmiCol: results.bmiCol,
+          name: appData.name, sex: appData.sex, age: appData.age,
+          height: appData.height, weight: appData.weight,
+          equation: appData.eq, formulaKey: appData.formulaKey,
+          folds: results.folds, bmi: results.bmi,
+          bf: results.bf, fm: results.fm, ffm: results.ffm,
+          bmiC: results.bmiC, bmiCol: results.bmiCol,
           interp: interp,
-          evaluatorName: appData.evaluatorName,
-          evaluatorProf: appData.evaluatorProf,
+          evaluatorName: appData.evaluatorName, evaluatorProf: appData.evaluatorProf,
           evaluationDate: evaluationDate
         };
-
-        const encoded = window.encodeData(shareData);
-        const longLink = 'https://bodycheckapp.github.io/BodyCheck1/?data=' + encoded;
-
+        const longLink = 'https://bodycheckapp.github.io/BodyCheck1/?data=' + encodeData(shareData);
         fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longLink)}`)
-          .then(response => response.text())
-          .then(shortLink => {
-            document.getElementById('share-link-input').value = shortLink;
-          })
-          .catch(err => {
-            document.getElementById('share-link-input').value = longLink;
-          });
-
+          .then(r => r.text()).then(s => { document.getElementById('share-link-input').value = s; })
+          .catch(() => { document.getElementById('share-link-input').value = longLink; });
         document.getElementById('share-modal').classList.add('show');
       }
 
+      // ── GERAR LINK — HISTÓRICO (card de avaliação passada) ──
+      function generateHistoryShareLink() {
+        if (!currentHistoryData) { showToast('Erro: dados não encontrados', 'error'); return; }
+        const shareData = {
+          name: currentHistoryData.name, sex: currentHistoryData.sex,
+          age: currentHistoryData.age, height: currentHistoryData.height, weight: currentHistoryData.weight,
+          equation: currentHistoryData.equation, formulaKey: currentHistoryData.formulaKey || '',
+          folds: currentHistoryData.folds, bmi: currentHistoryData.bmi,
+          bf: currentHistoryData.bf, fm: currentHistoryData.fm, ffm: currentHistoryData.ffm,
+          bmiC: currentHistoryData.bmiC, bmiCol: currentHistoryData.bmiCol,
+          interp: 'Avaliação histórica do aluno.',
+          evaluatorName: localStorage.getItem('bodycheck_eval_name') || '',
+          evaluatorProf: localStorage.getItem('bodycheck_eval_prof') || '',
+          evaluationDate: currentHistoryData.evaluationDate
+        };
+        const longLink = 'https://bodycheckapp.github.io/BodyCheck1/?data=' + encodeData(shareData);
+        fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longLink)}`)
+          .then(r => r.text()).then(s => { document.getElementById('share-link-input').value = s; })
+          .catch(() => { document.getElementById('share-link-input').value = longLink; });
+        document.getElementById('share-modal').classList.add('show');
+      }
+      window.generateHistoryShareLink = generateHistoryShareLink;
+
+      // ── GERAR LINK — GRÁFICOS DE EVOLUÇÃO ──
+      function generateChartsShareLink() {
+        const s = studentsDB.find(st => st.id === currentStudentId);
+        if (!s || s.history.length === 0) { showToast('Não há histórico para compartilhar.', 'error'); return; }
+        const historyArray = s.history.map(h => {
+          const fm  = h.fm  ? parseFloat(h.fm)  : parseFloat(((h.bf / 100) * h.weight).toFixed(1));
+          const ffm = h.ffm ? parseFloat(h.ffm) : parseFloat((h.weight - (h.bf / 100) * h.weight).toFixed(1));
+          return [h.date, parseFloat(h.weight), parseFloat(h.bf), fm, ffm];
+        });
+        const compressed = LZString.compressToEncodedURIComponent(JSON.stringify([s.name, s.sex, historyArray]));
+        const longLink = 'https://bodycheckapp.github.io/BodyCheck1/?c=' + compressed;
+        fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longLink)}`)
+          .then(r => r.text()).then(v => { document.getElementById('charts-share-link-input').value = v; })
+          .catch(() => { document.getElementById('charts-share-link-input').value = longLink; });
+        document.getElementById('charts-share-modal').classList.add('show');
+      }
+      window.generateChartsShareLink = generateChartsShareLink;
+
+      // ── COPIAR LINKS ──
       function copyShareLink() {
         const input = document.getElementById('share-link-input');
-        input.select();
-        input.setSelectionRange(0, 99999);
-       try {
-        document.execCommand('copy');
+        input.select(); input.setSelectionRange(0, 99999);
+        try { document.execCommand('copy'); } catch(e) { navigator.clipboard.writeText(input.value).catch(()=>{}); }
         showToast('Link copiado!', 'success');
-      } catch (err) {
-        navigator.clipboard.writeText(input.value).then(() => {
-          showToast('Link copiado!', 'success');
-        }).catch(() => {});
       }
-    }
+      function copyChartsShareLink() {
+        const input = document.getElementById('charts-share-link-input');
+        input.select(); input.setSelectionRange(0, 99999);
+        try { document.execCommand('copy'); } catch(e) { navigator.clipboard.writeText(input.value).catch(()=>{}); }
+        showToast('Link copiado!', 'success');
+      }
+      window.copyChartsShareLink = copyChartsShareLink;
 
+      // ── EVENT LISTENERS ──
       document.addEventListener('DOMContentLoaded', function() {
         if (checkSharedView()) return;
 
-        // Event listener para botão de ajuda da interpretação
         document.querySelectorAll('.help-icon').forEach(icon => {
           icon.addEventListener('click', function() {
             const id = this.getAttribute('data-help');
             const popup = document.getElementById(id);
-            document.querySelectorAll('.help-popup').forEach(p => {
-              if (p.id !== id) p.classList.remove('show');
-            });
+            document.querySelectorAll('.help-popup').forEach(p => { if (p.id !== id) p.classList.remove('show'); });
             popup.classList.toggle('show');
           });
         });
 
         document.getElementById('btn-quick-start').addEventListener('click', () => {
-             currentStudentId = null;
-             document.getElementById('name').value = '';
-             document.getElementById('age').value = '';
-             document.getElementById('height').value = '';
-             document.getElementById('weight').value = '';
-             document.querySelectorAll('.radio-option').forEach(o => o.classList.remove('selected'));
-             goToScreen('info');
+          currentStudentId = null;
+          document.getElementById('name').value = '';
+          document.getElementById('age').value = '';
+          document.getElementById('height').value = '';
+          document.getElementById('weight').value = '';
+          document.querySelectorAll('.radio-option').forEach(o => o.classList.remove('selected'));
+          goToScreen('info');
         });
 
         document.getElementById('btn-students-menu').addEventListener('click', () => goToScreen('students-screen'));
 
         document.querySelectorAll('.radio-option').forEach(opt => {
-          opt.addEventListener('click', function() {
-            selectSex(this, this.getAttribute('data-sex'));
-          });
+          opt.addEventListener('click', function() { selectSex(this, this.getAttribute('data-sex')); });
         });
 
         document.getElementById('btn-continue').addEventListener('click', () => {
-          if (validateInfo()) {
-            setupFolds();
-            goToScreen('folds');
-          }
+          if (validateInfo()) { setupFolds(); goToScreen('folds'); }
         });
 
         document.getElementById('btn-back-info').addEventListener('click', () => goToScreen('home'));
@@ -1935,9 +1822,8 @@ function displaySharedCharts(dataArray) {
         });
 
         document.getElementById('btn-new').addEventListener('click', () => {
-          appData = {name: '', sex: '', age: 0, height: 0, weight: 0, eq: '', inputsNeeded: [], evaluatorName: '', evaluatorProf: '', formulaKey: ''};
-          results = {};
-          currentFolds = {};
+          appData = {name:'', sex:'', age:0, height:0, weight:0, eq:'', inputsNeeded:[], evaluatorName:'', evaluatorProf:'', formulaKey:''};
+          results = {}; currentFolds = {};
           document.getElementById('name').value = '';
           document.getElementById('age').value = '';
           document.getElementById('height').value = '';
@@ -1945,14 +1831,10 @@ function displaySharedCharts(dataArray) {
           document.querySelectorAll('.radio-option').forEach(o => o.classList.remove('selected'));
           goToScreen('home');
         });
-        
+
         loadEvaluatorInfo();
       });
+
     })();
 
 </script>
-    <!-- Container de Notificações -->
-    <div class="toast-container" id="toast-container"></div>
-
-</body>
-</html>

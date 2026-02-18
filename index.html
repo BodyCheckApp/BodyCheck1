@@ -667,6 +667,12 @@ function displaySharedCharts(dataArray) {
     }
     
     (function checkLegal() {
+        const params = new URLSearchParams(window.location.search);
+        const isSharedLink = params.get('c') || params.get('data');
+        if (isSharedLink) {
+            document.getElementById('legal').classList.remove('active');
+            return;
+        }
         if(localStorage.getItem('bodycheck_legal_accepted') === 'true') {
             document.getElementById('legal').classList.remove('active');
             document.getElementById('home').classList.add('active');
@@ -1728,32 +1734,36 @@ function checkSharedView() {
     const chartsData = urlParams.get('c');
     if (chartsData) {
         try {
-            // Decodifica usando LZString (compatível com generateChartsShareLink)
             const jsonStr = LZString.decompressFromEncodedURIComponent(chartsData);
             if (jsonStr) {
                 const data = JSON.parse(jsonStr);
-
-                // Verifica se os dados parecem corretos (array com 3 itens)
                 if (Array.isArray(data) && data.length >= 3) {
+                    document.getElementById('legal').classList.remove('active');
                     displaySharedCharts(data);
-                    return true; // Paramos aqui, é uma visualização compartilhada
+                    return true;
                 }
             }
         } catch (e) {
             console.error('Erro ao processar link de gráficos:', e);
-            showToast('Link inválido ou expirado.', 'error');
         }
     }
 
-    // 2. Verifica se é um link de RESULTADO SIMPLES (?q=... ou ?data=...)
-    // (Mantenha sua lógica antiga aqui se quiser, ou use esta genérica)
-    const resultData = urlParams.get('q') || urlParams.get('data');
+    // 2. Verifica se é um link de RESULTADO SIMPLES (?data=...)
+    const resultData = urlParams.get('data');
     if (resultData) {
-       // ... Seu código existente para abrir o resultado da avaliação ...
-       // Se precisar desse código também, me avise.
+        try {
+            const data = window.decodeData(resultData);
+            if (data) {
+                document.getElementById('legal').classList.remove('active');
+                displaySharedResults(data);
+                return true;
+            }
+        } catch (e) {
+            console.error('Erro ao processar link de resultado:', e);
+        }
     }
-    
-    return false; // Não é link compartilhado, abre a home normal
+
+    return false;
 }
 
       function displaySharedResults(data) {
@@ -1977,26 +1987,6 @@ function checkSharedView() {
         loadEvaluatorInfo();
       });
     })();
-
-/* --- COLE ISSO NO FINAL DO SEU SCRIPT --- */
-document.addEventListener('DOMContentLoaded', () => {
-    const params = new URLSearchParams(window.location.search);
-    
-    // Verifica Link de Gráficos (?c=)
-    const chartData = params.get('c');
-    if (chartData) {
-        try {
-            // Tenta descomprimir com LZString
-            const jsonStr = LZString.decompressFromEncodedURIComponent(chartData);
-            if (jsonStr) {
-                const dataArray = JSON.parse(jsonStr);
-                displaySharedCharts(dataArray);
-            }
-        } catch(e) {
-            console.error("Erro ao carregar gráfico:", e);
-        }
-    }
-});
 
 </script>
     <!-- Container de Notificações -->

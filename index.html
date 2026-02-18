@@ -1668,6 +1668,7 @@ var LZString={compressToEncodedURIComponent:function(r){return r?btoa(unescape(e
         btnPdf.onclick = () => window.print();
         resultsDiv.appendChild(btnPdf);
 
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById('results').classList.add('active');
       }
 
@@ -1839,3 +1840,8 @@ var LZString={compressToEncodedURIComponent:function(r){return r?btoa(unescape(e
     })();
 
 </script>
+    <!-- Container de Notificações -->
+    <div class="toast-container" id="toast-container"></div>
+
+</body>
+</html>

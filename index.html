@@ -981,8 +981,7 @@ function displaySharedCharts(dataArray) {
         };
 
         const encoded = window.encodeData(shareData);
-        const baseUrl = window.location.href.split('?')[0];
-        const longLink = baseUrl + '?data=' + encoded;
+        const longLink = 'https://bodycheckapp.github.io/BodyCheck1/?data=' + encoded;
 
         fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longLink)}`)
           .then(response => response.text())
@@ -1174,8 +1173,7 @@ function displaySharedCharts(dataArray) {
         
         // Usa LZString para comprimir os dados (compatível com o código de leitura)
         const compressed = LZString.compressToEncodedURIComponent(JSON.stringify(shareData));
-        const baseUrl = window.location.href.split('?')[0];
-        const longLink = baseUrl + '?c=' + compressed;
+        const longLink = 'https://bodycheckapp.github.io/BodyCheck1/?c=' + compressed;
         
         fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longLink)}`)
             .then(response => response.text())
@@ -1880,8 +1878,7 @@ function checkSharedView() {
         };
 
         const encoded = window.encodeData(shareData);
-        const baseUrl = window.location.href.split('?')[0];
-        const longLink = baseUrl + '?data=' + encoded;
+        const longLink = 'https://bodycheckapp.github.io/BodyCheck1/?data=' + encoded;
 
         fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longLink)}`)
           .then(response => response.text())

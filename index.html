@@ -611,6 +611,12 @@ var LZString={compressToEncodedURIComponent:function(r){return r?btoa(unescape(e
     }
     
     (function checkLegal() {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('data') || params.get('c')) {
+            // Link compartilhado — não ativar home, o checkSharedView cuida disso
+            document.getElementById('legal').classList.remove('active');
+            return;
+        }
         if(localStorage.getItem('bodycheck_legal_accepted') === 'true') {
             document.getElementById('legal').classList.remove('active');
             document.getElementById('home').classList.add('active');
@@ -1659,8 +1665,7 @@ var LZString={compressToEncodedURIComponent:function(r){return r?btoa(unescape(e
         document.getElementById('btn-new').style.display          = 'none';
 
         // Ativar a tela de resultados
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById('results').classList.add('active');
+        goToScreen('results');
       }
 
       // ── EXIBIR GRÁFICOS COMPARTILHADOS ──
@@ -1691,8 +1696,7 @@ var LZString={compressToEncodedURIComponent:function(r){return r?btoa(unescape(e
             btn.style.display = 'none';
         });
 
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById('student-charts').classList.add('active');
+        goToScreen('student-charts');
       }
 
       // ── GERAR LINK — RESULTADOS (avaliação nova) ──

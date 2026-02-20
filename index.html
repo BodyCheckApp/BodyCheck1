@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>BodyCheck</title>
+    <script src="capacitor.js"></script>
+    <!-- Biblioteca jsPDF para geração de PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         /* --- CSS MANTIDO ORIGINAL (SEM ALTERAÇÕES) --- */
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -60,13 +64,6 @@
 
         .section-title { margin-bottom: 1.5rem; color: #1f2937; font-size: 1.4rem; font-weight: 700; }
         .info-text { color: #6b7280; margin-bottom: 1.5rem; font-size: 0.95rem; }
-
-        .share-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: 9999; align-items: center; justify-content: center; padding: 1rem; }
-        .share-modal.show { display: flex; }
-        .share-modal-content { background: #fff; padding: 2rem 1.5rem; border-radius: 16px; max-width: 500px; width: 100%; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3); animation: fadeIn 0.3s ease-in-out; }
-        .link-box { background: #f3f4f6; padding: 1rem; border-radius: 12px; border: 2px solid #e5e7eb; margin-bottom: 1rem; word-break: break-all; }
-        .link-box input { width: 100%; background: transparent; border: none; font-size: 0.85rem; color: #374151; font-family: monospace; padding: 0; }
-        .link-box input:focus { outline: none; }
 
         /* GRÁFICO */
         .composition-chart { background: #f9fafb; padding: 1.5rem; border-radius: 12px; margin: 1.5rem 0; border: 1px solid #eee; }
@@ -319,6 +316,344 @@
             .chart-segment.fat { background-color: #ef4444 !important; }
             .chart-segment.ffm { background-color: #0b2e5f !important; }
         }
+
+        /* ============================================
+           === CSS EXCLUSIVO PARA PDF - ALTA QUALIDADE ===
+           ============================================ */
+        
+        /* Container principal do PDF - fora da tela */
+        #pdf-export-container {
+            position: absolute;
+            left: -9999px;
+            top: -9999px;
+            visibility: hidden;
+        }
+        
+        /* Container interno do PDF com dimensões A4 */
+        .pdf-container {
+            background: #FFFFFF !important;
+            color: #000000 !important;
+            opacity: 1 !important;
+            filter: none !important;
+            transform: none !important;
+            
+            width: 794px; /* A4 width at 96 DPI */
+            min-height: 1123px; /* A4 height at 96 DPI */
+            
+            padding: 40px;
+            box-sizing: border-box;
+            
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        
+        /* Reset de todos os elementos filhos */
+        .pdf-container * {
+            opacity: 1 !important;
+            filter: none !important;
+            color: #000000 !important;
+        }
+        
+        /* Canvas com alta qualidade */
+        .pdf-container canvas {
+            image-rendering: high-quality !important;
+            image-rendering: -webkit-optimize-contrast !important;
+        }
+        
+        /* Imagens responsivas */
+        .pdf-container img {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        /* Tabelas */
+        .pdf-container table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .pdf-container th,
+        .pdf-container td {
+            padding: 8px;
+            border-bottom: 1px solid #E0E0E0;
+        }
+        
+        /* Header do PDF */
+        .pdf-header {
+            background: #0b2e5f !important;
+            color: #FFFFFF !important;
+            padding: 25px;
+            text-align: center;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+        
+        .pdf-header h1 {
+            color: #FFFFFF !important;
+            font-size: 28px;
+            margin: 0 0 8px 0;
+            font-weight: 700;
+        }
+        
+        .pdf-header p {
+            color: #FFFFFF !important;
+            font-size: 14px;
+            margin: 0;
+            opacity: 1 !important;
+        }
+        
+        /* Cards do PDF */
+        .pdf-card {
+            background: #FFFFFF !important;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 2px solid #E0E0E0 !important;
+            box-shadow: none !important;
+        }
+        
+        .pdf-card h3 {
+            color: #0b2e5f !important;
+            font-size: 18px;
+            margin-bottom: 15px;
+            font-weight: 700;
+            border-bottom: 2px solid #0b2e5f;
+            padding-bottom: 8px;
+        }
+        
+        /* Itens de resultado */
+        .pdf-result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #E0E0E0;
+        }
+        
+        .pdf-result-item:last-child {
+            border-bottom: none;
+        }
+        
+        .pdf-result-label {
+            color: #555555 !important;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .pdf-result-value {
+            color: #000000 !important;
+            font-weight: 700;
+            font-size: 16px;
+        }
+        
+        /* Classificação */
+        .pdf-classification {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+        
+        .pdf-classification.normal {
+            background: #D1FAE5 !important;
+            color: #065F46 !important;
+        }
+        
+        .pdf-classification.attention {
+            background: #FEF3C7 !important;
+            color: #92400E !important;
+        }
+        
+        .pdf-classification.warning {
+            background: #FEE2E2 !important;
+            color: #991B1B !important;
+        }
+        
+        /* Gráfico de composição */
+        .pdf-composition-chart {
+            background: #FFFFFF !important;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border: 2px solid #E0E0E0 !important;
+        }
+        
+        .pdf-composition-chart h3 {
+            color: #0b2e5f !important;
+            font-size: 18px;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+        
+        .pdf-chart-bar {
+            display: flex;
+            width: 100%;
+            height: 50px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #CCCCCC;
+        }
+        
+        .pdf-chart-segment {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #FFFFFF !important;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        
+        .pdf-chart-segment.fat {
+            background-color: #DC2626 !important;
+            color: #FFFFFF !important;
+        }
+        
+        .pdf-chart-segment.ffm {
+            background-color: #0b2e5f !important;
+            color: #FFFFFF !important;
+        }
+        
+        /* Legenda do gráfico */
+        .pdf-chart-legend {
+            display: flex;
+            gap: 20px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .pdf-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+        }
+        
+        .pdf-legend-color {
+            width: 18px;
+            height: 18px;
+            border-radius: 4px;
+        }
+        
+       .pdf-legend-color.fat {
+    background: #DC2626 !important; /* Cor vermelha para combinar com o gráfico */
+}
+
+.pdf-legend-color.ffm {
+    background: #0b2e5f !important; /* Cor azul escuro para combinar com o gráfico */
+}
+        
+        .pdf-legend-text {
+            color: #000000 !important;
+            font-weight: 600;
+        }
+        
+        /* Seção de referências */
+        .pdf-references {
+            background: #F8FAFC !important;
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #0b2e5f !important;
+            margin: 20px 0;
+        }
+        
+        .pdf-references h3 {
+            color: #0b2e5f !important;
+            font-size: 16px;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+        
+        .pdf-references p {
+            color: #333333 !important;
+            line-height: 1.6;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+        
+        /* Info do avaliador/aluno */
+        .pdf-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.3);
+            text-align: left;
+        }
+        
+        .pdf-info-section p {
+            margin: 0;
+            color: #FFFFFF !important;
+        }
+        
+        .pdf-info-section .label {
+            font-size: 10px;
+            color: rgba(255,255,255,0.9) !important;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+        
+        .pdf-info-section .value {
+            font-size: 13px;
+            font-weight: 700;
+            color: #FFFFFF !important;
+        }
+        
+        /* Data da avaliação */
+        .pdf-date {
+            text-align: center;
+            margin: 15px 0;
+            font-size: 13px;
+            color: #555555 !important;
+        }
+        
+        /* Gráficos de evolução */
+        .pdf-chart-card {
+            background: #FFFFFF !important;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 2px solid #E0E0E0 !important;
+        }
+        
+        .pdf-chart-card h4 {
+            color: #0b2e5f !important;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .pdf-chart-svg {
+            width: 100%;
+            height: auto;
+        }
+        
+        /* Estatísticas do gráfico */
+        .pdf-chart-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #E0E0E0;
+        }
+        
+        .pdf-chart-stat {
+            text-align: center;
+        }
+        
+        .pdf-chart-stat-label {
+            font-size: 10px;
+            color: #666666 !important;
+            text-transform: uppercase;
+        }
+        
+        .pdf-chart-stat-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: #000000 !important;
+        }
     </style>
 </head>
 <body>
@@ -326,7 +661,7 @@
 <script>
 
 // LZString Library - Versão mínima
-var LZString={compressToEncodedURIComponent:function(r){return r?btoa(unescape(encodeURIComponent(r))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=/g,""):""},decompressFromEncodedURIComponent:function(r){if(!r)return"";r+="===";try{return decodeURIComponent(escape(atob(r.replace(/-/g,"+").replace(/_/g,"/"))))}catch(e){return""}}};
+var LZString={compressToEncodedURIComponent:function(r){return r?btoa(unescape(encodeURIComponent(r))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=/g,""):""},decompressFromEncodedURIComponent:function(r){if(!r)return"";var e=r.replace(/-/g,"+").replace(/_/g,"/");var p=e.length%4;if(p)e+="=".repeat(4-p);try{return decodeURIComponent(escape(atob(e)))}catch(e){return""}}};
 
     (function blockDesktopAccess() {
       const ua = navigator.userAgent.toLowerCase();
@@ -365,8 +700,8 @@ var LZString={compressToEncodedURIComponent:function(r){return r?btoa(unescape(e
                  <p>Escolha uma opção abaixo para começar:</p>
             </div>
 
-            <button class="btn" id="btn-quick-start">Nova Avaliação</button>
-            <button class="btn btn-secondary" id="btn-students-menu">Meus Alunos / Histórico</button>
+            <button class="btn" id="btn-quick-start">Cadastrar Cliente</button>
+            <button class="btn btn-secondary" id="btn-students-menu">Meus Clientes / Histórico</button>
             
             <button class="btn btn-secondary" onclick="goToScreen('evaluator-settings')" style="margin-top:20px;">
                 Configurar
@@ -394,9 +729,8 @@ var LZString={compressToEncodedURIComponent:function(r){return r?btoa(unescape(e
                 <label>Crianças e Jovens (5-17 anos)</label>
                 <select id="pref-child" style="font-size: 0.9rem;">
                     <option value="slaughter">Slaughter et al. (1988) - (Dobras)</option>
-                    <option value="slaughter_calf">Slaughter (Modificado) - (Dobras)</option>
                 </select>
-                <p style="font-size:0.75rem; color:#888; margin-top:5px;">*Protocolos de dobras são o padrão ouro para esta faixa etária.</p>
+                <p style="font-size:0.75rem; color:#888; margin-top:5px;">*Protocolos de dobras são boas medidas para esta faixa etária.</p>
             </div>
 
             <div class="input-group">
@@ -422,9 +756,9 @@ var LZString={compressToEncodedURIComponent:function(r){return r?btoa(unescape(e
         </div>
 
         <div id="students-screen" class="screen">
-            <h2 class="section-title">Meus Alunos</h2>
+            <h2 class="section-title">Meus Clientes</h2>
             <div class="input-group">
-                <input type="text" id="search-student" placeholder="Buscar aluno..." onkeyup="filterStudents()">
+                <input type="text" id="search-student" placeholder="Buscar cliente..." onkeyup="filterStudents()">
             </div>
             <div id="students-list"></div>
             <button class="btn btn-secondary" onclick="goToScreen('home')" style="margin-top: 15px;">Voltar</button>
@@ -439,44 +773,33 @@ var LZString={compressToEncodedURIComponent:function(r){return r?btoa(unescape(e
         </div>
 
         <div id="student-profile" class="screen">
-            <h2 class="section-title" id="profile-title">Aluno</h2>
+            <h2 class="section-title" id="profile-title">Cliente</h2>
             <p id="profile-subtitle" class="info-text"></p>
             
-            <button class="btn" onclick="startStudentEval()">Nova Avaliação deste Aluno</button>
+            <button class="btn" onclick="startStudentEval()">Nova Avaliação</button>
             
             <div class="result-card">
                 <h3>Histórico de Avaliações</h3>
                 <div id="history-container"></div>
                 <button class="btn-charts" onclick="showStudentCharts()" id="btn-show-charts" style="display:none;">
-                    Ver Gráficos de Evolução
+                    Ver Gráficos do Histórico
                 </button>
             </div>
             <button class="btn btn-secondary" onclick="goToScreen('students-screen')">Voltar</button>
-            <button class="btn btn-secondary" onclick="deleteStudent()" style="background:#fee2e2; color:#dc2626; border:1px solid #fecaca;">Excluir Aluno</button>
+            <button class="btn btn-secondary" onclick="deleteStudentNew()" style="background:#fee2e2; color:#dc2626; border:1px solid #fecaca;">Excluir Cliente</button>
         </div>
 
-        <!-- NOVA TELA: GRÁFICOS DO ALUNO -->
+        <!-- NOVA TELA: GRÁFICOS DO CLIENTE -->
         <div id="student-charts" class="screen">
-            <h2 class="section-title" id="charts-title">Evolução</h2>
-            <p class="info-text">Acompanhe a evolução do aluno ao longo do tempo</p>
+            <h2 class="section-title" id="charts-title">Histórico</h2>
+            <p class="info-text">Acompanhe o histórico do cliente ao longo do tempo</p>
             
             <div class="charts-container" id="charts-container">
                 <!-- Gráficos serão inseridos aqui -->
             </div>
             
-            <button class="btn" id="btn-share-charts">Gerar Link Compartilhável</button>
-            <button class="btn btn-secondary" onclick="window.print()">Salvar como PDF</button>
+            <button class="btn btn-secondary" onclick="generateEvolutionPDFFromPage()">Salvar como PDF</button>
             <button class="btn btn-secondary" onclick="goToScreen('student-profile')">Voltar ao Perfil</button>
-            
-            <div id="charts-share-modal" class="share-modal">
-                <div class="share-modal-content">
-                    <h3 style="color: #1e4fa3; margin-bottom: 1rem;">Link Compartilhável</h3>
-                    <p style="color: #6b7280; margin-bottom: 1rem; font-size: 0.9rem;">Copie o link abaixo e compartilhe.</p>
-                    <div class="link-box"><input type="text" id="charts-share-link-input" readonly></div>
-                    <button class="btn" id="btn-copy-charts-link" style="margin-bottom: 0.5rem;">Copiar Link</button>
-                    <button class="btn back-btn" id="btn-close-charts-modal">Fechar</button>
-                </div>
-            </div>
         </div>
 
         <div id="info" class="screen">
@@ -561,43 +884,46 @@ var LZString={compressToEncodedURIComponent:function(r){return r?btoa(unescape(e
             <p><strong>Data da avaliação:</strong> <span id="result-date"></span></p>
 
             <button class="btn" id="btn-save-history">Salvar no Histórico do Aluno</button>
-
-            <button class="btn" id="btn-share-link">Gerar Link Compartilhável</button>
-            <button class="btn btn-secondary" onclick="window.print()">Salvar como PDF</button>
-            <button class="btn btn-secondary" id="btn-new">Nova Avaliação</button>
-
-            <div id="share-modal" class="share-modal">
-                <div class="share-modal-content">
-                    <h3 style="color: #1e4fa3; margin-bottom: 1rem;">Link Compartilhável</h3>
-                    <p style="color: #6b7280; margin-bottom: 1rem; font-size: 0.9rem;">Copie o link abaixo e compartilhe.</p>
-                    <div class="link-box"><input type="text" id="share-link-input" readonly></div>
-                    <button class="btn" id="btn-copy-link" style="margin-bottom: 0.5rem;">Copiar Link</button>
-                    <button class="btn back-btn" id="btn-close-modal">Fechar</button>
-                </div>
-            </div>
+            <button class="btn btn-secondary" onclick="generateResultsPDFFromPage()">Salvar como PDF</button>
+            <button class="btn btn-secondary" id="btn-new">Voltar</button>
         </div>
     </div>
 
 </div>
 
+<!-- CONTAINER EXCLUSIVO PARA EXPORTAÇÃO DE PDF - FORA DA TELA -->
+<div id="pdf-export-container">
+    <!-- O conteúdo do PDF será injetado aqui dinamicamente -->
+</div>
+
+<!-- MODAL DE CONFIRMAR EXCLUSÃO DE ALUNO -->
+<div id="modal-delete-student" class="restore-modal">
+    <div class="restore-modal-content">
+        <h3 style="color: #1e4fa3; margin-bottom: 1rem;">Excluir Aluno</h3>
+        <p id="modal-delete-message" style="color: #6b7280; margin-bottom: 1.5rem; font-size: 0.95rem;"></p>
+        <button class="btn" id="btn-delete-confirm" style="margin-bottom: 0.5rem;">Sim, Excluir</button>
+        <button class="btn back-btn" onclick="closeDeleteModal()">Cancelar</button>
+    </div>
+</div>
+
 <!-- MODAL DE RESTAURAR BACKUP -->
-<div id="restore-modal" class="restore-modal">
+<div id="modal-restore-backup" class="restore-modal">
     <div class="restore-modal-content">
         <h3 style="color: #1e4fa3; margin-bottom: 1rem;">Restaurar Backup</h3>
         <p style="color: #6b7280; margin-bottom: 1rem; font-size: 0.9rem;">Cole o código do backup abaixo. Isso substituirá os dados atuais.</p>
         <textarea id="restore-textarea" class="restore-textarea" placeholder="Cole aqui o código do backup..."></textarea>
-        <button class="btn" onclick="confirmRestoreData()" style="margin-bottom: 0.5rem;">Restaurar Dados</button>
+        <button class="btn" id="btn-restore-confirm" style="margin-bottom: 0.5rem;">Restaurar Dados</button>
         <button class="btn back-btn" onclick="closeRestoreModal()">Cancelar</button>
     </div>
 </div>
 
-<!-- MODAL DE CONFIRMAÇÃO GENÉRICO -->
-<div id="confirm-modal" class="restore-modal">
+<!-- MODAL DE CONFIRMAÇÃO FINAL DE RESTAURAÇÃO -->
+<div id="modal-restore-confirm" class="restore-modal">
     <div class="restore-modal-content">
-        <h3 id="confirm-title" style="color: #1e4fa3; margin-bottom: 1rem;">Confirmação</h3>
-        <p id="confirm-message" style="color: #6b7280; margin-bottom: 1.5rem; font-size: 0.95rem;"></p>
-        <button class="btn" id="confirm-yes-btn" style="margin-bottom: 0.5rem;">Sim</button>
-        <button class="btn back-btn" onclick="closeConfirmModal()">Não</button>
+        <h3 style="color: #1e4fa3; margin-bottom: 1rem;">Confirmar Restauração</h3>
+        <p style="color: #6b7280; margin-bottom: 1.5rem; font-size: 0.95rem;">Isso substituirá os dados atuais. Deseja continuar?</p>
+        <button class="btn" id="btn-restore-final" style="margin-bottom: 0.5rem;">Sim, Restaurar</button>
+        <button class="btn back-btn" onclick="closeRestoreConfirmModal()">Cancelar</button>
     </div>
 </div>
 
@@ -639,7 +965,6 @@ var LZString={compressToEncodedURIComponent:function(r){return r?btoa(unescape(e
     let studentsDB = JSON.parse(localStorage.getItem('bodycheck_students')) || [];
     let currentStudentId = null;
     let currentViewingHistoryIndex = null;
-    let currentHistoryData = null; // Armazena dados do histórico para compartilhamento
 
     // fieldNames global para acesso em todas as funções
     const fieldNames = {
@@ -776,22 +1101,6 @@ var LZString={compressToEncodedURIComponent:function(r){return r?btoa(unescape(e
         const h = s.history[historyIndex];
         currentViewingHistoryIndex = historyIndex;
         
-        // Armazenar dados para compartilhamento
-        currentHistoryData = {
-            name: s.name,
-            sex: s.sex,
-            age: h.age,
-            height: h.height,
-            weight: h.weight,
-            bf: h.bf,
-            fm: h.fm ? h.fm : ((h.bf / 100) * h.weight).toFixed(1),
-            ffm: h.ffm ? h.ffm : (h.weight - ((h.bf / 100) * h.weight)).toFixed(1),
-            folds: h.folds,
-            evaluationDate: h.date,
-            equation: '—',
-            formulaKey: ''
-        };
-        
         // Calcular fm e ffm se não existirem (dados antigos)
         const fm = h.fm ? h.fm : ((h.bf / 100) * h.weight).toFixed(1);
         const ffm = h.ffm ? h.ffm : (h.weight - parseFloat(fm)).toFixed(1);
@@ -804,7 +1113,7 @@ var LZString={compressToEncodedURIComponent:function(r){return r?btoa(unescape(e
         document.getElementById('r-age').textContent = h.age + ' anos';
         document.getElementById('r-height').textContent = h.height + ' cm';
         document.getElementById('r-weight').textContent = h.weight + ' kg';
-        document.getElementById('r-equation').textContent = '—';
+        document.getElementById('r-equation').textContent = h.eq || '—';
         document.getElementById('result-date').textContent = h.date;
         
         // Calcular IMC
@@ -820,11 +1129,6 @@ var LZString={compressToEncodedURIComponent:function(r){return r?btoa(unescape(e
         else if (bmi < 30) { bmiC = 'Sobrepeso'; bmiCol = 'attention'; }
         else { bmiC = 'Obesidade'; bmiCol = 'warning'; }
         document.getElementById('r-bmi-class').innerHTML = `<span class="classification ${bmiCol}">${bmiC}</span>`;
-        
-        // Armazenar classificação para compartilhamento
-        currentHistoryData.bmi = bmi;
-        currentHistoryData.bmiC = bmiC;
-        currentHistoryData.bmiCol = bmiCol;
         
         // Composição corporal
         const ffmPercent = (100 - parseFloat(h.bf)).toFixed(1);
@@ -852,6 +1156,22 @@ var LZString={compressToEncodedURIComponent:function(r){return r?btoa(unescape(e
         document.getElementById('r-interp').innerHTML = '<strong>Interpretação:</strong><br>Avaliação histórica do aluno.';
         document.getElementById('r-interp-text').value = '';
         
+        // Reconstruir referências científicas com dados salvos
+        const citText = h.citationText || 'Equações preditivas validadas cientificamente baseadas em dobras cutâneas e/ou circunferências corporais.';
+        const bmiText = h.bmiCitationText || 'World Health Organization (WHO). Obesity: preventing and managing the global epidemic (2000).';
+        const refHTML = `<div class="references-section">
+            <h3>Referências Científicas Utilizadas</h3>
+            <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Equação Utilizada:</strong> ${citText}</p></div>
+            <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Classificação do IMC:</strong> ${bmiText}</p></div>
+            <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Diretrizes Gerais:</strong> American College of Sports Medicine (ACSM). Guidelines for Exercise Testing and Prescription.</p></div>
+        </div>`;
+        
+        const oldRef = document.querySelector('.references-section');
+        if(oldRef) oldRef.remove();
+        
+        const interpDiv = document.getElementById('r-interp');
+        interpDiv.insertAdjacentHTML('afterend', refHTML);
+        
         // Gráfico de composição
         const oldChart = document.querySelector('.composition-chart-injected');
         if(oldChart) oldChart.remove();
@@ -873,15 +1193,11 @@ var LZString={compressToEncodedURIComponent:function(r){return r?btoa(unescape(e
         
         // Configurar botões de ação para histórico
         document.getElementById('btn-save-history').style.display = 'none';
-        document.getElementById('btn-share-link').style.display = 'block';
-        document.getElementById('btn-share-link').onclick = generateHistoryShareLink;
         document.getElementById('btn-new').textContent = 'Voltar ao Perfil';
         document.getElementById('btn-new').onclick = () => goToScreen('student-profile');
         
         goToScreen('results');
     }
-    
-    // Gerar link de compartilhamento para avaliação do histórico
 
     function startStudentEval() {
         const s = studentsDB.find(st => st.id === currentStudentId);
@@ -902,18 +1218,6 @@ var LZString={compressToEncodedURIComponent:function(r){return r?btoa(unescape(e
         const sexBtn = document.querySelector(`.radio-option[data-sex="${s.sex}"]`);
         sexBtn.click();
         goToScreen('info');
-    }
-
-    function deleteStudent() {
-        showConfirmModal(
-            "Excluir Aluno",
-            "Excluir este aluno e todo histórico?",
-            function() {
-                studentsDB = studentsDB.filter(s => s.id !== currentStudentId);
-                saveDB();
-                goToScreen('students-screen');
-            }
-        );
     }
 
     function saveHistoryEntry(data) {
@@ -943,7 +1247,11 @@ var LZString={compressToEncodedURIComponent:function(r){return r?btoa(unescape(e
                 bf: data.bf, 
                 fm: fm,
                 ffm: ffm,
-                folds: data.folds
+                folds: data.folds,
+                eq: data.eq,
+                formulaKey: data.formulaKey,
+                citationText: data.citationText,
+                bmiCitationText: data.bmiCitationText
             });
             saveDB();
             showToast('Avaliação salva no histórico do aluno', 'success');
@@ -970,64 +1278,659 @@ var LZString={compressToEncodedURIComponent:function(r){return r?btoa(unescape(e
     // === MODAL DE CONFIRMAÇÃO GENÉRICO ===
     let confirmCallback = null;
     
-    function showConfirmModal(title, message, onYes) {
-        document.getElementById('confirm-title').textContent = title;
-        document.getElementById('confirm-message').textContent = message;
-        confirmCallback = onYes;
-        
-        const yesBtn = document.getElementById('confirm-yes-btn');
-        yesBtn.onclick = function() {
-            closeConfirmModal();
-            if (confirmCallback) confirmCallback();
-        };
-        
-        document.getElementById('confirm-modal').classList.add('show');
+    // ============================================
+    // === NOVO: EXCLUIR ALUNO ===
+    // ============================================
+    // ============================================
+    // === FUNÇÕES DAS MODAIS ===
+    // ============================================
+    
+    function closeDeleteModal() {
+        document.getElementById('modal-delete-student').classList.remove('show');
     }
     
-    function closeConfirmModal() {
-        document.getElementById('confirm-modal').classList.remove('show');
-        confirmCallback = null;
-    }
-    window.showConfirmModal = showConfirmModal;
-    window.closeConfirmModal = closeConfirmModal;
-
-    // === MODAL DE RESTAURAR BACKUP (SEM USAR prompt() DO NAVEGADOR) ===
-    function showRestoreModal() {
-        document.getElementById('restore-textarea').value = '';
-        document.getElementById('restore-modal').classList.add('show');
-    }
-
     function closeRestoreModal() {
-        document.getElementById('restore-modal').classList.remove('show');
+        document.getElementById('modal-restore-backup').classList.remove('show');
     }
-
-    function confirmRestoreData() {
-        const input = document.getElementById('restore-textarea').value.trim();
-        if(!input) {
-            showToast("Cole o código do backup", "warning");
+    
+    function closeRestoreConfirmModal() {
+        document.getElementById('modal-restore-confirm').classList.remove('show');
+    }
+    
+    window.deleteStudentNew = function() {
+        if (!currentStudentId) {
+            showToast('Erro: selecione um aluno primeiro', 'error');
             return;
         }
-        try {
-            const data = JSON.parse(input);
-            if(Array.isArray(data)) {
-                showConfirmModal(
-                    "Confirmar Restauração",
-                    "Isso substituirá os dados atuais. Deseja continuar?",
-                    function() {
+        
+        const student = studentsDB.find(s => s.id === currentStudentId);
+        if (!student) {
+            showToast('Erro: aluno não encontrado', 'error');
+            return;
+        }
+        
+        // Mostrar modal
+        document.getElementById('modal-delete-message').textContent = `Tem certeza que deseja excluir ${student.name} e todo seu histórico?\n\nEsta ação não pode ser desfeita.`;
+        document.getElementById('modal-delete-student').classList.add('show');
+        
+        // Configurar botão de confirmação
+        document.getElementById('btn-delete-confirm').onclick = function() {
+            closeDeleteModal();
+            studentsDB = studentsDB.filter(s => s.id !== currentStudentId);
+            localStorage.setItem('bodycheck_students', JSON.stringify(studentsDB));
+            currentStudentId = null;
+            showToast('Aluno excluído com sucesso!', 'success');
+            
+            setTimeout(function() {
+                goToScreen('students-screen');
+                filterStudents();
+            }, 500);
+        };
+    }
+
+    window.showRestoreModal = function() {
+        document.getElementById('restore-textarea').value = '';
+        document.getElementById('modal-restore-backup').classList.add('show');
+        
+        // Configurar botão de restauração
+        document.getElementById('btn-restore-confirm').onclick = function() {
+            const backupCode = document.getElementById('restore-textarea').value.trim();
+            
+            if (!backupCode) {
+                showToast('Cole o código do backup', 'warning');
+                return;
+            }
+            
+            try {
+                const data = JSON.parse(backupCode);
+                if (Array.isArray(data)) {
+                    // Fechar modal de backup e mostrar confirmação
+                    closeRestoreModal();
+                    document.getElementById('modal-restore-confirm').classList.add('show');
+                    
+                    // Configurar botão de confirmação final
+                    document.getElementById('btn-restore-final').onclick = function() {
+                        closeRestoreConfirmModal();
                         studentsDB = data;
                         saveDB();
                         filterStudents();
-                        closeRestoreModal();
-                        showToast("Dados restaurados!", "success");
-                    }
-                );
-            } else {
-                showToast("Código inválido", "error");
+                        showToast('Dados restaurados com sucesso!', 'success');
+                    };
+                } else {
+                    showToast('Código inválido', 'error');
+                }
+            } catch(e) {
+                showToast('Erro ao ler código', 'error');
             }
-        } catch(e) {
-            showToast("Erro ao ler código", "error");
+        };
+    }
+
+    // ============================================
+    // === FUNÇÃO PARA GERAR PDF DOS RESULTADOS ===
+    // ============================================
+    async function generateResultsPDFFromPage() {
+        showToast('Gerando PDF...');
+        
+        try {
+            const { jsPDF } = window.jspdf;
+            
+            // Obter dados da tela de resultados
+            const evaluatorName = document.getElementById('r-evaluator')?.textContent || 'Não informado';
+            const evaluatorProf = document.getElementById('r-evaluator-prof')?.textContent || 'Não informada';
+            const patientName = document.getElementById('r-name')?.textContent || 'Paciente';
+            const patientSex = document.getElementById('r-sex')?.textContent || '--';
+            const patientAge = document.getElementById('r-age')?.textContent || '--';
+            const patientHeight = document.getElementById('r-height')?.textContent || '--';
+            const patientWeight = document.getElementById('r-weight')?.textContent || '--';
+            const equation = document.getElementById('r-equation')?.textContent || '--';
+            const bmi = document.getElementById('r-bmi')?.textContent || '--';
+            const bmiClass = document.getElementById('r-bmi-class')?.innerHTML || '--';
+            const bf = document.getElementById('r-bf')?.textContent || '--';
+            const fm = document.getElementById('r-fm')?.textContent || '--';
+            const ffm = document.getElementById('r-ffm')?.textContent || '--';
+            const evalDate = document.getElementById('result-date')?.textContent || new Date().toLocaleDateString('pt-BR');
+            const interpretation = document.getElementById('r-interp-text')?.value || '';
+            
+            // Obter dados coletados
+            const foldsContainer = document.getElementById('r-folds-container');
+            let foldsHTML = '';
+            if (foldsContainer && foldsContainer.children.length > 0) {
+                Array.from(foldsContainer.children).forEach(item => {
+                    const label = item.querySelector('.result-label')?.textContent || '';
+                    const value = item.querySelector('.result-value')?.textContent || '';
+                    foldsHTML += `
+                        <div class="pdf-result-item">
+                            <span class="pdf-result-label">${label}</span>
+                            <span class="pdf-result-value">${value}</span>
+                        </div>
+                    `;
+                });
+            }
+            
+            // Calcular percentuais para o gráfico
+            const bfPercent = parseFloat(bf) || 0;
+            const ffmPercent = (100 - bfPercent).toFixed(1);
+            const fmValue = parseFloat(fm) || 0;
+            const ffmValue = parseFloat(ffm) || 0;
+            
+            // Obter HTML das referências que estão sendo mostradas na tela
+            const referencesSection = document.querySelector('.references-section');
+            const referencesHTML = referencesSection ? referencesSection.outerHTML : `<div class="references-section">
+                        <h3>Referências Científicas</h3>
+                        <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Equação Utilizada:</strong> Equações preditivas validadas cientificamente baseadas em dobras cutâneas e/ou circunferências corporais.</p></div>
+                        <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Classificação do IMC:</strong> World Health Organization (WHO). Obesity: preventing and managing the global epidemic (2000).</p></div>
+                        <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Diretrizes Gerais:</strong> American College of Sports Medicine (ACSM). Guidelines for Exercise Testing and Prescription.</p></div>
+                    </div>`;
+            
+            // Criar HTML do PDF
+            const pdfHTML = `
+                <div class="pdf-container">
+                    <!-- Header -->
+                    <div class="pdf-header">
+                        <h1>BodyCheck</h1>
+                        <p>Avaliação da Composição Corporal</p>
+                        <div class="pdf-info-grid">
+                            <div class="pdf-info-section">
+                                <p class="label">AVALIADOR</p>
+                                <p class="value">${evaluatorName}</p>
+                                <p class="value">${evaluatorProf}</p>
+                            </div>
+                            <div class="pdf-info-section">
+                                <p class="label">PACIENTE</p>
+                                <p class="value">${patientName}</p>
+                                <p class="value">${patientSex} | ${patientAge}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Data -->
+                    <p class="pdf-date"><strong>Data da Avaliação:</strong> ${evalDate}</p>
+                    
+                    <!-- Informações do Paciente -->
+                    <div class="pdf-card">
+                        <h3>Informações do Paciente</h3>
+                        <div class="pdf-result-item">
+                            <span class="pdf-result-label">Nome</span>
+                            <span class="pdf-result-value">${patientName}</span>
+                        </div>
+                        <div class="pdf-result-item">
+                            <span class="pdf-result-label">Sexo</span>
+                            <span class="pdf-result-value">${patientSex}</span>
+                        </div>
+                        <div class="pdf-result-item">
+                            <span class="pdf-result-label">Idade</span>
+                            <span class="pdf-result-value">${patientAge}</span>
+                        </div>
+                        <div class="pdf-result-item">
+                            <span class="pdf-result-label">Altura</span>
+                            <span class="pdf-result-value">${patientHeight}</span>
+                        </div>
+                        <div class="pdf-result-item">
+                            <span class="pdf-result-label">Massa Corporal</span>
+                            <span class="pdf-result-value">${patientWeight}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Dados Coletados -->
+                    <div class="pdf-card">
+                        <h3>Dados Coletados</h3>
+                        ${foldsHTML || '<p style="color: #666; font-size: 13px;">Nenhuma medida registrada</p>'}
+                        <div class="pdf-result-item" style="margin-top: 10px; border-top: 1px solid #E0E0E0; padding-top: 10px;">
+                            <span class="pdf-result-label" style="font-style: italic; font-size: 12px;">Equação utilizada</span>
+                            <span class="pdf-result-value" style="font-size: 13px; font-weight: 500;">${equation}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- IMC -->
+                    <div class="pdf-card">
+                        <h3>Índice de Massa Corporal (IMC)</h3>
+                        <div class="pdf-result-item">
+                            <span class="pdf-result-label">IMC</span>
+                            <span class="pdf-result-value">${bmi}</span>
+                        </div>
+                        <div class="pdf-result-item">
+                            <span class="pdf-result-label">Classificação</span>
+                            <span>${bmiClass.replace('classification', 'pdf-classification')}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Composição Corporal -->
+                    <div class="pdf-card">
+                        <h3>Composição Corporal</h3>
+                        <div class="pdf-result-item">
+                            <span class="pdf-result-label">Percentual de Gordura</span>
+                            <span class="pdf-result-value">${bf}</span>
+                        </div>
+                        <div class="pdf-result-item">
+                            <span class="pdf-result-label">Massa Gorda</span>
+                            <span class="pdf-result-value">${fm}</span>
+                        </div>
+                        <div class="pdf-result-item">
+                            <span class="pdf-result-label">Massa Livre de Gordura</span>
+                            <span class="pdf-result-value">${ffm}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Gráfico de Composição -->
+                    <div class="pdf-composition-chart">
+                        <h3>Gráfico de Composição Corporal</h3>
+                        <div class="pdf-chart-bar">
+                            <div class="pdf-chart-segment fat" style="width: ${bfPercent}%; min-width: ${bfPercent > 5 ? 'auto' : '40px'};">${bfPercent > 8 ? bf + '%' : ''}</div>
+                            <div class="pdf-chart-segment ffm" style="width: ${ffmPercent}%; min-width: ${ffmPercent > 5 ? 'auto' : '40px'};">${ffmPercent > 8 ? ffmPercent + '%' : ''}</div>
+                        </div>
+                        <div class="pdf-chart-legend">
+                            <div class="pdf-legend-item">
+                                <div class="pdf-legend-color fat"></div>
+                                <span class="pdf-legend-text">Massa Gorda: ${bf} (${fmValue.toFixed(1)} kg)</span>
+                            </div>
+                            <div class="pdf-legend-item">
+                                <div class="pdf-legend-color ffm"></div>
+                                <span class="pdf-legend-text">Massa Livre de Gordura: ${ffmPercent}% (${ffmValue.toFixed(1)} kg)</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    ${interpretation ? `<div class="pdf-card">
+                        <h3>Interpretação dos Resultados</h3>
+                        <p style="color: #374151; line-height: 1.7; white-space: pre-wrap;">${interpretation}</p>
+                    </div>` : ''}
+                    
+                    <!-- Referências -->
+                    ${referencesHTML}
+                </div>
+            `;
+            
+            // Inserir no container oculto
+            const pdfContainer = document.getElementById('pdf-export-container');
+            pdfContainer.innerHTML = pdfHTML;
+            pdfContainer.style.visibility = 'visible';
+            
+            // Capturar com html2canvas em alta qualidade
+            const pdfElement = pdfContainer.querySelector('.pdf-container');
+            const canvas = await html2canvas(pdfElement, {
+                scale: 3,
+                useCORS: true,
+                backgroundColor: '#FFFFFF',
+                logging: false,
+                allowTaint: true,
+                imageTimeout: 0
+            });
+            
+            // Ocultar novamente
+            pdfContainer.style.visibility = 'hidden';
+            pdfContainer.innerHTML = '';
+            
+            // Criar PDF com qualidade máxima
+            const pdf = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: 'a4',
+                compress: false
+            });
+            
+            const imgData = canvas.toDataURL('image/png', 1.0);
+            
+            const pageWidth = 210;
+            const pageHeight = 297;
+            const imgWidth = canvas.width;
+            const imgHeight = canvas.height;
+            const ratio = imgWidth / imgHeight;
+            
+            let finalWidth = pageWidth;
+            let finalHeight = finalWidth / ratio;
+            
+            if (finalHeight > pageHeight) {
+                finalHeight = pageHeight;
+                finalWidth = finalHeight * ratio;
+            }
+            
+            const x = (pageWidth - finalWidth) / 2;
+            const y = 0;
+            
+            pdf.addImage(imgData, 'PNG', x, y, finalWidth, finalHeight, undefined, 'FAST');
+            
+            // Salvar
+            const fileName = 'BodyCheck_Resultados_' + patientName.replace(/\s+/g, '_') + '_' + evalDate.replace(/\//g, '-') + '.pdf';
+
+            await savePDFWithCapacitor(pdf, fileName);
+
+            showToast('PDF de Resultados gerado!', 'success');
+        } catch (error) {
+            console.error('Erro ao gerar PDF:', error);
+            showToast('Erro ao gerar PDF: ' + error.message, 'error');
         }
     }
+    window.generateResultsPDFFromPage = generateResultsPDFFromPage;
+
+    // ============================================
+    // === FUNÇÃO AUXILIAR PARA SALVAR PDF COM CAPACITOR ===
+    // ============================================
+    async function savePDFWithCapacitor(pdf, fileName) {
+    // 1. Alerta de teste para ver se o botão funciona
+    // alert("Iniciando salvamento...");
+
+    try {
+        // No Capacitor via HTML direto, usamos 'window.Capacitor.Plugins'
+        const { Filesystem, FileOpener } = window.Capacitor.Plugins;
+
+        if (!Filesystem || !FileOpener) {
+            throw new Error("Plugins não encontrados. O npx cap sync foi feito?");
+        }
+
+        const pdfOutput = pdf.output('datauristring');
+        const base64Data = pdfOutput.split(',')[1];
+
+        // 2. Salvar o arquivo
+        const result = await Filesystem.writeFile({
+            path: fileName,
+            data: base64Data,
+            directory: 'DOCUMENTS',
+            recursive: true
+        });
+
+        // 3. Abrir o arquivo (Aqui o Android pedirá a permissão)
+        await FileOpener.open({
+            filePath: result.uri,
+            contentType: 'application/pdf'
+        });
+
+    } catch (error) {
+        console.error('Erro:', error);
+        // Se falhar o método nativo, ele tenta o download do navegador
+        pdf.save(fileName);
+      
+    }
+}
+    window.savePDFWithCapacitor = savePDFWithCapacitor;
+
+    // ============================================
+    // === FUNÇÃO PARA GERAR PDF DE EVOLUÇÃO ===
+    // ============================================
+    async function generateEvolutionPDFFromPage() {
+        const student = studentsDB.find(st => st.id === currentStudentId);
+        if (!student || student.history.length === 0) {
+            showToast('Nenhum histórico disponível', 'warning');
+            return;
+        }
+        
+        showToast('Gerando PDF de Histórico...');
+        
+        try {
+            const { jsPDF } = window.jspdf;
+            
+            const evaluatorName = localStorage.getItem('bodycheck_eval_name') || 'Não informado';
+            const evaluatorProf = localStorage.getItem('bodycheck_eval_prof') || 'Não informada';
+            const latestEval = student.history[student.history.length - 1];
+            const currentDate = new Date().toLocaleDateString('pt-BR');
+            
+            // Preparar dados para gráficos
+            const historyData = student.history.map(h => ({
+                date: h.date,
+                weight: parseFloat(h.weight),
+                bf: parseFloat(h.bf),
+                ffm: parseFloat((100 - parseFloat(h.bf)).toFixed(1))
+            }));
+            
+            // Criar SVGs dos gráficos
+            const weightChart = createPDFLineChart('Massa Corporal (kg)', historyData, 'weight', '#0b2e5f');
+            const bfChart = createPDFLineChart('Massa Gorda (%)', historyData, 'bf', '#0b2e5f');
+            const ffmChart = createPDFLineChart('Massa Livre de Gordura (%)', historyData, 'ffm', '#0b2e5f');
+            
+            // Criar HTML do PDF
+            const pdfHTML = `
+                <div class="pdf-container">
+                    <!-- Header -->
+                    <div class="pdf-header">
+                        <h1>BodyCheck - Histórico</h1>
+                        <p>Acompanhamento da Composição Corporal</p>
+                        <div class="pdf-info-grid">
+                            <div class="pdf-info-section">
+                                <p class="label">AVALIADOR</p>
+                                <p class="value">${evaluatorName}</p>
+                                <p class="value">${evaluatorProf}</p>
+                            </div>
+                            <div class="pdf-info-section">
+                                <p class="label">ALUNO</p>
+                                <p class="value">${student.name}</p>
+                                <p class="value">${latestEval.weight}kg | ${latestEval.height}cm | ${latestEval.age}a</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Data -->
+                    <p class="pdf-date"><strong>Relatório gerado em:</strong> ${currentDate}</p>
+                    
+                    <!-- Gráficos -->
+                    ${weightChart}
+                    ${bfChart}
+                    ${ffmChart}
+                </div>
+            `;
+            
+            // Inserir no container oculto
+            const pdfContainer = document.getElementById('pdf-export-container');
+            pdfContainer.innerHTML = pdfHTML;
+            pdfContainer.style.visibility = 'visible';
+            
+            // Capturar com html2canvas em alta qualidade
+            const pdfElement = pdfContainer.querySelector('.pdf-container');
+            const canvas = await html2canvas(pdfElement, {
+                scale: 3,
+                useCORS: true,
+                backgroundColor: '#FFFFFF',
+                logging: false,
+                allowTaint: true,
+                imageTimeout: 0
+            });
+            
+            // Ocultar novamente
+            pdfContainer.style.visibility = 'hidden';
+            pdfContainer.innerHTML = '';
+            
+            // Criar PDF com qualidade máxima
+            const pdf = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: 'a4',
+                compress: false
+            });
+            
+            const imgData = canvas.toDataURL('image/png', 1.0);
+            
+            const pageWidth = 210;
+            const pageHeight = 297;
+            const imgWidth = canvas.width;
+            const imgHeight = canvas.height;
+            const ratio = imgWidth / imgHeight;
+            
+            let finalWidth = pageWidth;
+            let finalHeight = finalWidth / ratio;
+            
+            if (finalHeight > pageHeight) {
+                finalHeight = pageHeight;
+                finalWidth = finalHeight * ratio;
+            }
+            
+            const x = (pageWidth - finalWidth) / 2;
+            const y = 0;
+            
+            pdf.addImage(imgData, 'PNG', x, y, finalWidth, finalHeight, undefined, 'FAST');
+            
+            // Salvar
+            const fileName = 'BodyCheck_Evolucao_' + student.name.replace(/\s+/g, '_') + '_' + currentDate.replace(/\//g, '-') + '.pdf';
+
+            await savePDFWithCapacitor(pdf, fileName);
+
+            showToast('PDF de Histórico gerado!', 'success');
+        } catch (error) {
+            console.error('Erro ao gerar PDF:', error);
+            showToast('Erro ao gerar PDF: ' + error.message, 'error');
+        }
+    }
+    window.generateEvolutionPDFFromPage = generateEvolutionPDFFromPage;
+
+    // Função auxiliar para criar gráficos de linha em SVG para PDF
+    function createPDFLineChart(title, data, key, color) {
+        const values = data.map(d => d[key]);
+        const minVal = Math.min(...values);
+        const maxVal = Math.max(...values);
+        const range = maxVal - minVal || 1;
+        const yMin = Math.max(0, minVal - range * 0.1);
+        const yMax = maxVal + range * 0.1;
+        
+        const width = 714; // 794 - 40px padding each side
+        const height = 250;
+        const paddingX = 60;
+        const paddingY = 40;
+        const chartWidth = width - paddingX * 2;
+        const chartHeight = height - paddingY * 2;
+        
+        // Gerar pontos
+        const points = data.map((d, i) => {
+            const x = paddingX + (i / (data.length - 1)) * chartWidth;
+            const y = paddingY + chartHeight - ((d[key] - yMin) / (yMax - yMin)) * chartHeight;
+            return { x, y, value: d[key], date: d.date };
+        });
+        
+        // Criar path da linha
+        const linePath = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
+        
+        // Criar path da área
+        const areaPath = `${linePath} L ${points[points.length - 1].x} ${paddingY + chartHeight} L ${points[0].x} ${paddingY + chartHeight} Z`;
+        
+        // Linhas de grade
+        let gridLines = '';
+        for (let i = 0; i <= 4; i++) {
+            const y = paddingY + (i / 4) * chartHeight;
+            const val = (yMax - (i / 4) * (yMax - yMin)).toFixed(1);
+            gridLines += `<line x1="${paddingX}" y1="${y}" x2="${width - paddingX}" y2="${y}" stroke="#E0E0E0" stroke-width="1"/>`;
+            gridLines += `<text x="${paddingX - 10}" y="${y + 4}" font-size="11" fill="#666666" text-anchor="end">${val}</text>`;
+        }
+        
+        // Pontos
+        const circles = points.map(p => 
+            `<circle cx="${p.x}" cy="${p.y}" r="6" fill="${color}" stroke="#FFFFFF" stroke-width="2"/>`
+        ).join('');
+        
+        // Eixo X - datas
+        let dateLabels = '';
+        const step = Math.ceil(data.length / 5);
+        for (let i = 0; i < data.length; i += step) {
+            const x = paddingX + (i / (data.length - 1)) * chartWidth;
+            const dateParts = data[i].date.split('/');
+            dateLabels += `<text x="${x}" y="${height - 10}" font-size="11" fill="#666666" text-anchor="middle">${dateParts[0]}/${dateParts[1]}</text>`;
+        }
+        
+        // Estatísticas
+        const firstVal = values[0];
+        const lastVal = values[values.length - 1];
+        const variation = (lastVal - firstVal).toFixed(1);
+        const variationPercent = firstVal !== 0 ? ((variation / firstVal) * 100).toFixed(1) : '0.0';
+        const variationSign = variation >= 0 ? '+' : '';
+        const variationColor = '#0b2e5f';
+        
+        return `
+        <div class="pdf-chart-card">
+            <h4>${title}</h4>
+            <svg class="pdf-chart-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMidYMid meet">
+                ${gridLines}
+                <path d="${areaPath}" fill="${color}" fill-opacity="0.1"/>
+                <path d="${linePath}" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                ${circles}
+                ${dateLabels}
+            </svg>
+            <div class="pdf-chart-stats">
+                <div class="pdf-chart-stat">
+                    <div class="pdf-chart-stat-label">Inicial</div>
+                    <div class="pdf-chart-stat-value">${firstVal.toFixed(1)}</div>
+                </div>
+                <div class="pdf-chart-stat">
+                    <div class="pdf-chart-stat-label">Atual</div>
+                    <div class="pdf-chart-stat-value">${lastVal.toFixed(1)}</div>
+                </div>
+                <div class="pdf-chart-stat">
+                    <div class="pdf-chart-stat-label">Variação</div>
+                    <div class="pdf-chart-stat-value" style="color: ${variationColor}">${variationSign}${variation} (${variationSign}${variationPercent}%)</div>
+                </div>
+            </div>
+        </div>
+        `;
+    }
+
+
+
+    /*
+    ═══════════════════════════════════════════════════════════════════
+    IMPLEMENTAÇÃO NO ANDROID STUDIO (Opcional - para integração nativa)
+    ═══════════════════════════════════════════════════════════════════
+    
+    Se desejar integração nativa com o Android, adicione esta classe
+    no seu projeto Android Studio:
+    
+    ─────────────────────────────────────────────────────────────────
+    JavaScriptInterface.java:
+    ─────────────────────────────────────────────────────────────────
+    
+    public class JavaScriptInterface {
+        private Context context;
+        private Activity activity;
+        
+        public JavaScriptInterface(Context context, Activity activity) {
+            this.context = context;
+            this.activity = activity;
+        }
+        
+        @JavascriptInterface
+        public void savePDF(String base64Data, String fileName) {
+            activity.runOnUiThread(() -> {
+                try {
+                    // Decodifica o Base64
+                    byte[] pdfBytes = Base64.decode(base64Data, Base64.DEFAULT);
+                    
+                    // Salva o arquivo
+                    File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+                    File pdfFile = new File(downloadsDir, fileName);
+                    
+                    FileOutputStream fos = new FileOutputStream(pdfFile);
+                    fos.write(pdfBytes);
+                    fos.close();
+                    
+                    // Compartilha o arquivo
+                    Uri uri = FileProvider.getUriForFile(context, context.getPackageName() + ".provider", pdfFile);
+                    Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                    shareIntent.setType("application/pdf");
+                    shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+                    shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Relatório BodyCheck");
+                    shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    
+                    Intent chooser = Intent.createChooser(shareIntent, "Compartilhar PDF");
+                    activity.startActivity(chooser);
+                    
+                } catch (Exception e) {
+                    Toast.makeText(context, "Erro ao salvar PDF: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+    }
+    
+    ─────────────────────────────────────────────────────────────────
+    MainActivity.java:
+    ─────────────────────────────────────────────────────────────────
+    
+    WebView webView = findViewById(R.id.webview);
+    WebSettings webSettings = webView.getSettings();
+    webSettings.setJavaScriptEnabled(true);
+    webSettings.setDomStorageEnabled(true);
+    webSettings.setAllowFileAccess(true);
+    
+    // Adiciona a interface JavaScript
+    webView.addJavascriptInterface(new JavaScriptInterface(this, this), "Android");
+    
+    // Carrega o HTML
+    webView.loadUrl("file:///android_asset/index.html");
+    
+    ═══════════════════════════════════════════════════════════════════
+    */
 
     // === FUNÇÕES DE GRÁFICOS ===
     
@@ -1039,7 +1942,7 @@ var LZString={compressToEncodedURIComponent:function(r){return r?btoa(unescape(e
             return;
         }
         
-        document.getElementById('charts-title').innerText = `Evolução - ${s.name}`;
+        document.getElementById('charts-title').innerText = `Histórico - ${s.name}`;
         
         const container = document.getElementById('charts-container');
         container.innerHTML = '';
@@ -1054,7 +1957,7 @@ var LZString={compressToEncodedURIComponent:function(r){return r?btoa(unescape(e
         
         // Criar 3 gráficos
         container.innerHTML += createLineChart('Massa Corporal (kg)', historyData, 'weight', '#0b2e5f');
-        container.innerHTML += createLineChart('Massa Gorda (%)', historyData, 'bf', '#ef4444');
+        container.innerHTML += createLineChart('Massa Gorda (%)', historyData, 'bf', '#0b2e5f');
         container.innerHTML += createLineChart('Massa Livre de Gordura (%)', historyData, 'ffm', '#0b2e5f');
         
         goToScreen('student-charts');
@@ -1142,7 +2045,7 @@ var LZString={compressToEncodedURIComponent:function(r){return r?btoa(unescape(e
                 </div>
                 <div class="chart-stat">
                     <div class="chart-stat-label">Variação</div>
-                    <div class="chart-stat-value" style="color: ${variation >= 0 ? '#10b981' : '#ef4444'}">${variationSign}${variation} (${variationSign}${variationPercent}%)</div>
+                    <div class="chart-stat-value" style="color: #0b2e5f">${variationSign}${variation} (${variationSign}${variationPercent}%)</div>
                 </div>
             </div>
         </div>
@@ -1164,15 +2067,15 @@ var LZString={compressToEncodedURIComponent:function(r){return r?btoa(unescape(e
 
       // BANCO DE REFERÊNCES COMPLETAS
       const citations = {
-          'slaughter': 'Slaughter, M. H., et al. (1988). Skinfold equations for estimation of body fatness in children and youth. <em>Human Biology</em>, 60(5), 709-723.',
-          'slaughter_calf': 'Slaughter, M. H., et al. (1988). Skinfold equations for estimation of body fatness in children and youth. <em>Human Biology</em>, 60(5), 709-723.',
-          'jackson3': 'Jackson, A. S., & Pollock, M. L. (1978). Generalized equations for predicting body density of men. <em>British Journal of Nutrition</em>, 40(3), 497-504.',
-          'petroski': 'Petroski, E. L. (1995). Desenvolvimento e validação de equações generalizadas para a estimativa da densidade corporal em adultos. <em>Tese de Doutorado, UFSM</em>.',
-          'navy': 'Hodgdon, J. A., & Beckett, M. B. (1984). Prediction of percent body fat for U.S. Navy men and women from body circumferences and height. <em>Naval Health Research Center</em>.',
-          'weltman_obese': 'Weltman, A., et al. (1988). Accurate prediction of body composition in obese females. <em>The American Journal of Clinical Nutrition</em>, 48(4), 925-930.',
-          'durnin': 'Durnin, J. V. G. A., & Womersley, J. (1974). Body fat assessed from total body density and its estimation from skinfold thickness. <em>British Journal of Nutrition</em>, 32(1), 77-97.',
-          'rech': 'Rech, C. R., et al. (2006). Validação de equações antropométricas para a estimativa da gordura corporal em idosos do sul do Brasil. <em>Revista Brasileira de Medicina do Esporte</em>, 12(1), 1-7.',
-          'navy_elder': 'Hodgdon, J. A., & Beckett, M. B. (1984). Prediction of percent body fat for U.S. Navy men and women from body circumferences and height. <em>Naval Health Research Center</em>.'
+          'slaughter': 'SLAUGHTER, M. H. et al. Skinfold equations for estimation of body fatness in children and youth. Human Biology, v. 60, n. 5, p. 709-723, 1988.',
+          'slaughter_calf': 'SLAUGHTER, M. H. et al. Skinfold equations for estimation of body fatness in children and youth. Human Biology, v. 60, n. 5, p. 709-723, 1988.',
+          'jackson3': 'JACKSON, A. S.; POLLOCK, M. L. Generalized equations for predicting body density of men. British Journal of Nutrition, v. 40, n. 3, p. 497-504, 1978.',
+          'petroski': 'PETROSKI, E. L. Desenvolvimento e validação de equações generalizadas para a estimativa da densidade corporal em adultos. Tese (Doutorado) – UFSM, 1995.',
+          'navy': 'HODGDON, J. A.; BECKETT, M. B. Prediction of body fat for Navy men: body composition from equations based on anthropometrically determined body density. Naval Health Research Center, 1984.',
+          'weltman_obese': 'WELTMAN, A. et al. Accurate prediction of body composition in obese females. American Journal of Clinical Nutrition, v. 48, n. 5, p. 1179-1183, 1988.',
+          'durnin': 'DURNIN, J. V. G. A.; WOMERSLEY, J. Body fat assessed from total body density and its estimation from skinfold thickness. British Journal of Nutrition, 1974.',
+          'rech': 'RECH, C. R. et al. Validade de equações antropométricas para a estimativa da gordura corporal em idosos do sul do Brasil. Revista Brasileira de Cineantropometria e Desempenho Humano, v. 8, n. 1, p. 01-09, 2006.',
+          'navy_elder': 'HODGDON, J. A.; BECKETT, M. B. Prediction of body fat for Navy men: body composition from equations based on anthropometrically determined body density. Naval Health Research Center, 1984.'
       };
 
       const bmiRefs = {
@@ -1500,12 +2403,12 @@ var LZString={compressToEncodedURIComponent:function(r){return r?btoa(unescape(e
             document.querySelector('.chart-segment.ffm').innerText = ffmPercent + '%';
         }
 
-        const citationText = citations[appData.formulaKey] || appData.eq;
-        const bmiCitationText = results.bmiRefString;
+        const citationText = citations[appData.formulaKey] || appData.eq || 'Equações preditivas validadas cientificamente baseadas em dobras cutâneas e/ou circunferências corporais.';
+        const bmiCitationText = results.bmiRefString || 'World Health Organization (WHO). Obesity: preventing and managing the global epidemic (2000).';
 
         const referencesHTML = `<div class="references-section">
             <h3>Referências Científicas Utilizadas</h3>
-            <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Protocolo de Gordura:</strong> ${citationText}</p></div>
+            <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Equação Utilizada:</strong> ${citationText}</p></div>
             <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Classificação do IMC:</strong> ${bmiCitationText}</p></div>
             <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Diretrizes Gerais:</strong> American College of Sports Medicine (ACSM). Guidelines for Exercise Testing and Prescription.</p></div>
             </div>`;
@@ -1522,12 +2425,16 @@ var LZString={compressToEncodedURIComponent:function(r){return r?btoa(unescape(e
             saveHistoryEntry({
                 name: appData.name,
                 sex: appData.sex,
-                evaluationDate, weight, height, age, bf: results.bf, fm: results.fm, ffm: results.ffm, folds: currentFolds
+                evaluationDate, weight, height, age, bf: results.bf, fm: results.fm, ffm: results.ffm, folds: currentFolds,
+                eq: appData.eq,
+                formulaKey: appData.formulaKey,
+                citationText: citationText,
+                bmiCitationText: bmiCitationText
             });
         };
         
-        // Resetar botão Nova Avaliação
-        document.getElementById('btn-new').textContent = 'Nova Avaliação';
+        // Resetar botão Voltar
+        document.getElementById('btn-new').textContent = 'Voltar';
         document.getElementById('btn-new').onclick = function() {
           appData = {name: '', sex: '', age: 0, height: 0, weight: 0, eq: '', inputsNeeded: [], evaluatorName: '', evaluatorProf: '', formulaKey: ''};
           results = {};
@@ -1539,245 +2446,12 @@ var LZString={compressToEncodedURIComponent:function(r){return r?btoa(unescape(e
           document.querySelectorAll('.radio-option').forEach(o => o.classList.remove('selected'));
           goToScreen('home');
         };
-        
-        // Resetar botão de compartilhamento para usar a função padrão
-        document.getElementById('btn-share-link').style.display = 'block';
-        document.getElementById('btn-share-link').onclick = generateShareLink;
 
         goToScreen('results');
       }
 
-      // ── ENCODE / DECODE ──
-      function encodeData(data) {
-        return btoa(unescape(encodeURIComponent(JSON.stringify(data))));
-      }
-      function decodeData(encoded) {
-        try { return JSON.parse(decodeURIComponent(escape(atob(encoded)))); }
-        catch(e) { return null; }
-      }
-
-      function checkSharedView() {
-        const urlParams = new URLSearchParams(window.location.search);
-
-        // Link de gráficos (?c=)
-        const chartsData = urlParams.get('c');
-        if (chartsData) {
-          try {
-            const jsonStr = LZString.decompressFromEncodedURIComponent(chartsData);
-            if (jsonStr) {
-              const data = JSON.parse(jsonStr);
-              if (Array.isArray(data) && data.length >= 3) {
-                displaySharedCharts(data);
-                return true;
-              }
-            }
-          } catch(e) {}
-        }
-
-        // Link de resultado (?data=)
-        const sharedData = urlParams.get('data');
-        if (sharedData) {
-          const data = decodeData(sharedData);
-          if (data) {
-            displaySharedResults(data);
-            return true;
-          }
-        }
-        return false;
-      }
-
-      function displaySharedResults(data) {
-        document.getElementById('home').style.display = 'none';
-        document.getElementById('info').style.display = 'none';
-        document.getElementById('folds').style.display = 'none';
-
-        document.getElementById('r-name').textContent = data.name;
-        document.getElementById('r-sex').textContent = data.sex === 'm' ? 'Masculino' : 'Feminino';
-        document.getElementById('r-age').textContent = data.age + ' anos';
-        document.getElementById('r-height').textContent = data.height + ' cm';
-        document.getElementById('r-weight').textContent = data.weight + ' kg';
-        document.getElementById('result-date').textContent = data.evaluationDate || '—';
-        document.getElementById('r-equation').textContent = data.equation;
-        document.getElementById('r-evaluator').textContent = data.evaluatorName || '—';
-        document.getElementById('r-evaluator-prof').textContent = data.evaluatorProf || '—';
-
-        const fc = document.getElementById('r-folds-container');
-        fc.innerHTML = '';
-        for (let k in data.folds) {
-          if(fieldNames[k]) {
-             const d = document.createElement('div');
-             d.className = 'result-item';
-             const unit = fieldNames[k].n.includes('cm') ? 'cm' : 'mm';
-             const label = fieldNames[k].n.split('(')[0];
-             d.innerHTML = `<span class="result-label">${label}</span><span class="result-value">${data.folds[k]} ${unit}</span>`;
-             fc.appendChild(d);
-          }
-        }
-
-        document.getElementById('r-bmi').textContent = data.bmi;
-        document.getElementById('r-bmi-class').innerHTML = `<span class="classification ${data.bmiCol}">${data.bmiC}</span>`;
-
-        document.getElementById('r-bf').textContent = data.bf + '%';
-        document.getElementById('r-fm').textContent = data.fm + ' kg';
-        document.getElementById('r-ffm').textContent = data.ffm + ' kg';
-
-        const bfPercent = parseFloat(data.bf);
-        const ffmPercent = (100 - bfPercent).toFixed(1);
-
-        const chartHTML = `<div class="composition-chart">
-          <h3 style="color: #1e4fa3; margin-bottom: 1rem; font-size: 1.15rem;">Gráfico de Composição Corporal</h3>
-          <div class="chart-single-bar">
-            <div class="chart-segment fat" style="width: ${bfPercent}%">${data.bf}%</div>
-            <div class="chart-segment ffm" style="width: ${ffmPercent}%">${ffmPercent}%</div>
-          </div>
-          <div class="chart-legend">
-            <div class="legend-item"><div class="legend-color fat"></div><span class="legend-text">Massa Gorda: ${data.bf}% (${data.fm} kg)</span></div>
-            <div class="legend-item"><div class="legend-color ffm"></div><span class="legend-text">Massa Livre de Gordura: ${ffmPercent}% (${data.ffm} kg)</span></div>
-          </div></div>`;
-        const bodyCompositionCard = document.getElementById('r-bf').closest('.result-card');
-        bodyCompositionCard.insertAdjacentHTML('afterend', chartHTML);
-
-        const interpEl = document.getElementById('r-interp');
-        interpEl.style.display = 'block';
-        interpEl.innerHTML = '<strong>Interpretação:</strong><br>' + (data.interp || '—');
-
-        const interpTextGroup = document.getElementById('r-interp-text');
-        if (interpTextGroup) interpTextGroup.closest('.input-group').style.display = 'none';
-
-        const citationText = citations[data.formulaKey] || data.equation;
-        const bmiCitationText = bmiRefs[data.age >= 60 ? 'elder' : (data.age <= 17 ? 'child' : 'adult')] || 'WHO';
-
-        const referencesHTML = `<div class="references-section">
-          <h3>Referências Científicas</h3>
-          <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Protocolo de Gordura:</strong> ${citationText}</p></div>
-          <div class="reference-item"><span class="reference-bullet">•</span><p><strong>Classificação do IMC:</strong> ${bmiCitationText}</p></div></div>`;
-        const disclaimerHTML = `<div class="disclaimer-box"><p><strong>Aviso Legal:</strong> Esta avaliação não substitui diagnóstico médico ou nutricional. Os resultados representam estimativas da composição corporal baseadas em equações de predição validadas cientificamente.</p></div>`;
-
-        interpEl.insertAdjacentHTML('afterend', referencesHTML);
-        interpEl.nextElementSibling.insertAdjacentHTML('afterend', disclaimerHTML);
-
-        document.getElementById('btn-share-link').style.display = 'none';
-        document.getElementById('btn-new').style.display = 'none';
-        document.getElementById('btn-save-history').style.display = 'none';
-
-        const resultsDiv = document.getElementById('results');
-        const btnPdf = document.createElement('button');
-        btnPdf.className = 'btn';
-        btnPdf.style.background = '#0b2e5f';
-        btnPdf.innerHTML = 'Salvar como PDF';
-        btnPdf.onclick = () => window.print();
-        resultsDiv.appendChild(btnPdf);
-
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById('results').classList.add('active');
-      }
-
-      // ── EXIBIR GRÁFICOS COMPARTILHADOS ──
-      function displaySharedCharts(dataArray) {
-        const name       = dataArray[0];
-        const rawHistory = dataArray[2];
-
-        // Mesmo formato que showStudentCharts usa internamente
-        const historyData = rawHistory.map(h => ({
-          date:   h[0],
-          weight: parseFloat(h[1]),
-          bf:     parseFloat(h[2]),
-          ffm:    parseFloat((100 - parseFloat(h[2])).toFixed(1))
-        }));
-
-        document.getElementById('charts-title').innerText = 'Evolução - ' + name;
-
-        const container = document.getElementById('charts-container');
-        container.innerHTML = '';
-        container.innerHTML += createLineChart('Massa Corporal (kg)',        historyData, 'weight', '#0b2e5f');
-        container.innerHTML += createLineChart('Massa Gorda (%)',             historyData, 'bf',     '#ef4444');
-        container.innerHTML += createLineChart('Massa Livre de Gordura (%)', historyData, 'ffm',    '#0b2e5f');
-
-        // Esconder botões do avaliador; manter PDF
-        document.getElementById('btn-share-charts').style.display = 'none';
-        document.querySelectorAll('#student-charts button').forEach(btn => {
-          if ((btn.getAttribute('onclick') || '').includes('student-profile'))
-            btn.style.display = 'none';
-        });
-
-        goToScreen('student-charts');
-      }
-
-      // ── GERAR LINK — RESULTADOS (avaliação nova) ──
-      function generateShareLink() {
-        const interp = (document.getElementById('r-interp-text').value.trim()) || 'Interpretação não fornecida.';
-        const shareData = {
-          name: appData.name, sex: appData.sex, age: appData.age,
-          height: appData.height, weight: appData.weight,
-          equation: appData.eq, formulaKey: appData.formulaKey,
-          folds: results.folds, bmi: results.bmi,
-          bf: results.bf, fm: results.fm, ffm: results.ffm,
-          bmiC: results.bmiC, bmiCol: results.bmiCol,
-          interp: interp,
-          evaluatorName: appData.evaluatorName, evaluatorProf: appData.evaluatorProf,
-          evaluationDate: evaluationDate
-        };
-        const longLink = 'https://bodycheckapp.github.io/BodyCheck1/index.html?data=' + encodeData(shareData);
-        document.getElementById('share-link-input').value = longLink;
-        document.getElementById('share-modal').classList.add('show');
-      }
-
-      // ── GERAR LINK — HISTÓRICO (card de avaliação passada) ──
-      function generateHistoryShareLink() {
-        if (!currentHistoryData) { showToast('Erro: dados não encontrados', 'error'); return; }
-        const shareData = {
-          name: currentHistoryData.name, sex: currentHistoryData.sex,
-          age: currentHistoryData.age, height: currentHistoryData.height, weight: currentHistoryData.weight,
-          equation: currentHistoryData.equation, formulaKey: currentHistoryData.formulaKey || '',
-          folds: currentHistoryData.folds, bmi: currentHistoryData.bmi,
-          bf: currentHistoryData.bf, fm: currentHistoryData.fm, ffm: currentHistoryData.ffm,
-          bmiC: currentHistoryData.bmiC, bmiCol: currentHistoryData.bmiCol,
-          interp: 'Avaliação histórica do aluno.',
-          evaluatorName: localStorage.getItem('bodycheck_eval_name') || '',
-          evaluatorProf: localStorage.getItem('bodycheck_eval_prof') || '',
-          evaluationDate: currentHistoryData.evaluationDate
-        };
-        const longLink = 'https://bodycheckapp.github.io/BodyCheck1/index.html?data=' + encodeData(shareData);
-        document.getElementById('share-link-input').value = longLink;
-        document.getElementById('share-modal').classList.add('show');
-      }
-      window.generateHistoryShareLink = generateHistoryShareLink;
-
-      // ── GERAR LINK — GRÁFICOS DE EVOLUÇÃO ──
-      function generateChartsShareLink() {
-        const s = studentsDB.find(st => st.id === currentStudentId);
-        if (!s || s.history.length === 0) { showToast('Não há histórico para compartilhar.', 'error'); return; }
-        const historyArray = s.history.map(h => {
-          const fm  = h.fm  ? parseFloat(h.fm)  : parseFloat(((h.bf / 100) * h.weight).toFixed(1));
-          const ffm = h.ffm ? parseFloat(h.ffm) : parseFloat((h.weight - (h.bf / 100) * h.weight).toFixed(1));
-          return [h.date, parseFloat(h.weight), parseFloat(h.bf), fm, ffm];
-        });
-        const compressed = LZString.compressToEncodedURIComponent(JSON.stringify([s.name, s.sex, historyArray]));
-        const longLink = 'https://bodycheckapp.github.io/BodyCheck1/index.html?c=' + compressed;
-        document.getElementById('charts-share-link-input').value = longLink;
-        document.getElementById('charts-share-modal').classList.add('show');
-      }
-      window.generateChartsShareLink = generateChartsShareLink;
-
-      // ── COPIAR LINKS ──
-      function copyShareLink() {
-        const input = document.getElementById('share-link-input');
-        input.select(); input.setSelectionRange(0, 99999);
-        try { document.execCommand('copy'); } catch(e) { navigator.clipboard.writeText(input.value).catch(()=>{}); }
-        showToast('Link copiado!', 'success');
-      }
-      function copyChartsShareLink() {
-        const input = document.getElementById('charts-share-link-input');
-        input.select(); input.setSelectionRange(0, 99999);
-        try { document.execCommand('copy'); } catch(e) { navigator.clipboard.writeText(input.value).catch(()=>{}); }
-        showToast('Link copiado!', 'success');
-      }
-      window.copyChartsShareLink = copyChartsShareLink;
-
       // ── EVENT LISTENERS ──
       document.addEventListener('DOMContentLoaded', function() {
-        if (checkSharedView()) return;
-
         document.querySelectorAll('.help-icon').forEach(icon => {
           icon.addEventListener('click', function() {
             const id = this.getAttribute('data-help');
@@ -1811,18 +2485,6 @@ var LZString={compressToEncodedURIComponent:function(r){return r?btoa(unescape(e
         document.getElementById('btn-calculate').addEventListener('click', calculate);
         document.getElementById('btn-back-folds').addEventListener('click', () => goToScreen('info'));
 
-        document.getElementById('btn-share-link').addEventListener('click', () => generateShareLink());
-        document.getElementById('btn-copy-link').addEventListener('click', copyShareLink);
-        document.getElementById('btn-close-modal').addEventListener('click', () => {
-          document.getElementById('share-modal').classList.remove('show');
-        });
-
-        document.getElementById('btn-share-charts').addEventListener('click', () => generateChartsShareLink());
-        document.getElementById('btn-copy-charts-link').addEventListener('click', copyChartsShareLink);
-        document.getElementById('btn-close-charts-modal').addEventListener('click', () => {
-          document.getElementById('charts-share-modal').classList.remove('show');
-        });
-
         document.getElementById('btn-new').addEventListener('click', () => {
           appData = {name:'', sex:'', age:0, height:0, weight:0, eq:'', inputsNeeded:[], evaluatorName:'', evaluatorProf:'', formulaKey:''};
           results = {}; currentFolds = {};
@@ -1842,6 +2504,8 @@ var LZString={compressToEncodedURIComponent:function(r){return r?btoa(unescape(e
 </script>
     <!-- Container de Notificações -->
     <div class="toast-container" id="toast-container"></div>
+<div id="toast-container" class="toast-container"></div>
+
 
 </body>
 </html>
